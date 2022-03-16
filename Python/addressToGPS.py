@@ -16,13 +16,12 @@ import json
 clientId = '7gbuolojz1'
 appkey = 'JnGuxK4RYSLPlXaP1gCXAa3fKiku312v6SUGElID'
 # ----------------------------------------------
-
 api_url = 'https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query='
 
 root = tkinter.Tk()
 root.withdraw()
 tkinter.messagebox.showinfo(title='정보', message='불러올 엑셀파일을 선택해주세요.\n컬럼구조는\n|점포코드|구주소|도로명주소|')
-dir_path = filedialog.askopenfile(parent=root, initialdir="/",title='파일를 선택해주세요')
+dir_path = filedialog.askopenfilename()
 
 print(dir_path.name)
 
