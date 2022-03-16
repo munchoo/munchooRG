@@ -69,7 +69,7 @@ for add  in data['도로명주소']:
     geo_coordi.append([latitude, longitude])
 
 np_geo_coordi = np.array(geo_coordi)
-pd_geo_coodi = pd.DataFrame({'구주소': data['구주소'].values, '도로명': data['도로명주소'].values, '위도': np_geo_coordi[:,0], '경도': np_geo_coordi[:,1]})
+pd_geo_coodi = pd.DataFrame({'점포코드':data['점포코드'].values,'구주소': data['구주소'].values, '도로명': data['도로명주소'].values, '위도': np_geo_coordi[:,0], '경도': np_geo_coordi[:,1]})
 
 #save result
 writer = pd.ExcelWriter('output_v2.xlsx')
