@@ -9,7 +9,7 @@ scopes = [
 ]
 
 
-# Initialize the Parser.
+# Initialize the Parpser.
 config = ConfigParser()
 
 # Read the file.

@@ -26,8 +26,24 @@ SELECT    TO_CHAR(A.REGI_DTTM,'YYYYMMDD') AS 영업일자
   JOIN    LGMJVDP.TB_STORE_DM F
     ON    SUBSTR(C.ORIGIN_BIZPL_CD,2,4) = F.STORECD
    AND    F.RGNCD BETWEEN ('41') AND ('60')
-   WHERE    TO_CHAR(A.REGI_DTTM,'YYYYMMDD') BETWEEN REPLACE('2022-02-01','-','')AND REPLACE('2022-03-09','-','')
+
+-------영업일수를 일자별로 구해서 INNER JOIN으로 영업일수가 0인 점포 제외하기 ----------
+  INNER JOIN (select	a11.STORECD  STORECD,
+                a11.DATECD  DATECD,
+                sum(a11.SALDT_CNT)  영업일수
+              from	LGMJVDP.TB_SALDT_FT	a11
+              join	LGMJVDP.TB_STORE_DM	a13
+                  on 	(a11.STORECD = a13.STORECD)
+              where	a11.DATECD BETWEEN ('2022-02-01') AND to_char(sysdate,'YYYY-MM-DD')
+              group by	a11.STORECD,
+                a11.DATECD
+              Having sum(a11.SALDT_CNT) > 0
+              ) Z
+    ON F.STORECD = Z.STORECD AND TO_CHAR(A.REGI_DTTM,'YYYY-MM-DD') = Z.DATECD
+
+   WHERE    TO_CHAR(A.REGI_DTTM,'YYYYMMDD') BETWEEN REPLACE('2022-02-01','-','')AND to_char(sysdate,'YYYYMMDD')
 --   AND    A.DLIV_RQUST_SP_CD ='D'
+
 GROUP by TO_CHAR(A.REGI_DTTM,'YYYYMMDD')
      ,    TO_CHAR(A.DLIV_RQUST_ACQ_DTTM,'YYYY-MM-DD HH24:MI:SS')
      ,    TO_CHAR(A.REGI_DTTM, 'YYYY-MM-DD HH24:MI:SS')
@@ -44,6 +60,20 @@ GROUP by TO_CHAR(A.REGI_DTTM,'YYYYMMDD')
           WHEN A.DLIV_RQUST_SP_CD in ('D') THEN '점포취소'
           ELSE '기타' END
      ,    A.DLIV_RQUST_STAT_CD
+
+
+-----------------------------------------------------영업일수 뽑아내기
+
+select	a11.STORECD  STORECD,
+      	a11.DATECD  DATECD,
+	      sum(a11.SALDT_CNT)  영업일수
+from	LGMJVDP.TB_SALDT_FT	a11
+join	LGMJVDP.TB_STORE_DM	a13
+	  on 	(a11.STORECD = a13.STORECD)
+where	a11.DATECD BETWEEN ('2022-02-01') AND to_char(sysdate,'YYYY-MM-DD')
+group by	a11.STORECD,
+	a11.DATECD
+
 
 --------------판매
 

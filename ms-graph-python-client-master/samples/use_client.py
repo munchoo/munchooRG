@@ -2,14 +2,7 @@ from pprint import pprint
 from configparser import ConfigParser
 from ms_graph.client import MicrosoftGraphClient
 
-scopes = [
-    "Calendars.ReadWrite",
-    "Files.ReadWrite.All",
-    "User.ReadWrite.All",
-    "Notes.ReadWrite.All",
-    "Directory.ReadWrite.All",
-    "User.Read.All",
-]
+scopes = ['User.Read', 'Chat.ReadWrite', 'Chat.Create']
 
 # Initialize the Parser.
 config = ConfigParser()
