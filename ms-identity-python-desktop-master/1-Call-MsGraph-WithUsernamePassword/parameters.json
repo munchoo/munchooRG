@@ -1,0 +1,8 @@
+{
+    "authority": "https://login.microsoftonline.com/organizations",
+    "client_id": "312435a5-4dd6-40f8-a606-49bbb30c254d",
+    "username": "munchoo@gsretail.com",
+    "password": "dud5@ska2",
+    "scope": ["User.ReadBasic.All"],
+    "endpoint": "https://graph.microsoft.com/v1.0/users"
+}
