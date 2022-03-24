@@ -18,11 +18,7 @@ with open(file_path, 'r', encoding='utf-8') as file:
     data = json.load(file)
     data = data.get('value')
     for idx in data:
-        idmatt[idx.get('givenName')] = idx.get('id')
-
-
-
-
+        idmatt[idx.get('givenName')] = {'id':idx.get('id'),'chat_id':''}
 
 ### 앱 기본정보 입력
 APPLICATION_ID = '312435a5-4dd6-40f8-a606-49bbb30c254d'
@@ -83,7 +79,7 @@ for OFCName in idmatt.keys():
     }
 
     #### chat_sender 보내는 사람 설정하기
-    bd_chat_creat['members'][1]['user@odata.bind'] = f"https://graph.microsoft.com/v1.0/users(\'{idmatt[OFCName]}\')"
+    bd_chat_creat['members'][1]['user@odata.bind'] = f"https://graph.microsoft.com/v1.0/users(\'{idmatt[OFCName]['id']}\')"
     ##### 보내는 메세지 json
     # bd_message_send = {'body': {'content': 'test:'}}
 
@@ -93,13 +89,17 @@ for OFCName in idmatt.keys():
 # ### 챗 생성하기 requests.post
     endpoint = base_url + 'chats'
     response = requests.post(endpoint, data=data_chat_creat, headers=headers)
-    print(response.json())
-    time(5)
-    print('done')
+    idmatt[OFCName]['chat_id'] = response.json()['id']
+    print(idmatt)
+    time.sleep(5)
+
+with open('./Graph/memberinfo.json', 'w', encoding='utf-8') as wfile:
+    json.dump(idmatt, wfile, indent=4)
+    
     
 
-# ### 메세지 보내기 requests.post 
-# endpoint_message = base_url + 'chats/' + response.json()['id'] + '/messages'
-# response2 = requests.post(endpoint_message, data=data_message_send, headers=headers)
+# # ### 메세지 보내기 requests.post 
+# # endpoint_message = base_url + 'chats/' + response.json()['id'] + '/messages'
+# # response2 = requests.post(endpoint_message, data=data_message_send, headers=headers)
 
-# # https://graph.microsoft.com/v1.0/chats/19:bbd521b3-17df-44f9-9461-0e4751e750a4_dc6321ca-2f64-41fe-aa20-8d1f28465edd@unq.gbl.spaces/messages
+# # # https://graph.microsoft.com/v1.0/chats/19:bbd521b3-17df-44f9-9461-0e4751e750a4_dc6321ca-2f64-41fe-aa20-8d1f28465edd@unq.gbl.spaces/messages
