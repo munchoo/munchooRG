@@ -1,0 +1,33 @@
+{
+    "chatType": "oneOnOne",
+    "members": [
+        {
+            "@odata.type": "#microsoft.graph.aadUserConversationMember",
+            "roles": [
+                "owner"
+            ],
+            "user@odata.bind": "https://graph.microsoft.com/v1.0/users('bbd521b3-17df-44f9-9461-0e4751e750a4')"
+        },
+        {
+            "@odata.type": "#microsoft.graph.aadUserConversationMember",
+            "roles": [
+                "owner"
+            ],
+            "user@odata.bind": "https://graph.microsoft.com/v1.0/users('dc6321ca-2f64-41fe-aa20-8d1f28465edd')"
+        }
+    ]
+}
+
+
+
+{
+    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#chats/$entity",
+    "id": "19:bbd521b3-17df-44f9-9461-0e4751e750a4_dc6321ca-2f64-41fe-aa20-8d1f28465edd@unq.gbl.spaces",
+    "topic": null,
+    "createdDateTime": "2020-05-12T04:28:41.945Z",
+    "lastUpdatedDateTime": "2022-03-11T08:55:50.565Z",
+    "chatType": "oneOnOne",
+    "webUrl": "https://teams.microsoft.com/l/chat/19%3Abbd521b3-17df-44f9-9461-0e4751e750a4_dc6321ca-2f64-41fe-aa20-8d1f28465edd%40unq.gbl.spaces/0?tenantId=4645c25c-9775-4d77-a736-700fab766116",
+    "tenantId": "4645c25c-9775-4d77-a736-700fab766116",
+    "onlineMeetingInfo": null
+}
