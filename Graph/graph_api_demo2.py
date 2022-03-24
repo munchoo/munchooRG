@@ -8,6 +8,7 @@ from msal import ConfidentialClientApplication
 from sqlalchemy import false
 import json
 import pprint
+import time
 
 
 #### 구성원 ID불러오기 
@@ -93,7 +94,9 @@ for OFCName in idmatt.keys():
     endpoint = base_url + 'chats'
     response = requests.post(endpoint, data=data_chat_creat, headers=headers)
     print(response.json())
-
+    time(5)
+    print('done')
+    
 
 # ### 메세지 보내기 requests.post 
 # endpoint_message = base_url + 'chats/' + response.json()['id'] + '/messages'
