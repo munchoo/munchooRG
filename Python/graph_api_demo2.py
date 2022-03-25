@@ -1,3 +1,10 @@
+### graph api v1.0 을 이용하여 ms의 azure의 서비스를 컨트롤 할 수 있게 함. 
+### 접근하는 모듈은 msal을 이용하였으며, confidentialclientapplication을 이용하여
+### 연결 인스턴스를 만들고 그후 get_authorization_request_url을 이용하여 
+### 리다이렉션한 주소로 토큰값을 받아오게 했는데 그럴 필요 없음
+### 바로 Acqure_token_by_username_password를 이용하여 받아오게 설정. 
+### 레퍼런스에서는 해당 메소드를 권장하지는 않음. 
+
 from email import message
 from os import access
 from numpy import heaviside
@@ -15,7 +22,7 @@ base_url = 'https://graph.microsoft.com/v1.0/'
 username = "munchoo@gsretail.com"
 password = "dud5@ska2"
 
-SCOPES = ['User.Read', 'Chat.ReadWrite', 'Chat.Create']
+SCOPES = ['User.Read', 'Chat.ReadWrite', 'Chat.Create', 'Chat.Read', 'Chat.ReadBasic', 'Chat.ReadWrite', 'ChatMessage.Send', 'ChannelMessage.Send' ]
 
 # methon 1 : 
 client_instance = msal.ConfidentialClientApplication(
@@ -31,7 +38,6 @@ access_token = client_instance.acquire_token_by_username_password(
      scopes=SCOPES
 )
 
-
 print(access_token)
 
 access_token_id = access_token['access_token']
@@ -40,7 +46,7 @@ headers = {
     'Accept' : 'application/json',
     'Content-Type' : 'application/json'
     }
-bodys = {'body': {'content': 'test:'}}
+bodys = {'body': {'content': 'save 신철:'}}
 send_message = json.dumps(bodys)
 print(bodys)
 

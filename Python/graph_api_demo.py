@@ -6,7 +6,7 @@ import msal as msal
 from msal import ConfidentialClientApplication
 from sqlalchemy import false
 import urllib
-  
+
 APPLICATION_ID = '312435a5-4dd6-40f8-a606-49bbb30c254d'
 CLIENT_SECRET = '6SH7Q~-bKmoBmiVopd-sRv6cjKwQd-HB9g2GL'
 authority_url = 'https://login.microsoftonline.com/gsretail.co.kr'
