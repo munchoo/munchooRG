@@ -9,6 +9,7 @@ from sqlalchemy import false
 import json
 import pprint
 import time
+import pandas as pd
 
 ### 멤버정보 가져오기
 file_path = './Graph/memInfo.json'
@@ -23,15 +24,12 @@ username = "munchoo@gsretail.com"
 password = "dud5@ska2"
 SCOPES = ['User.Read', 'Chat.ReadWrite', 'Chat.Create']  ### permmition 불러오기 azure portal에서 등록해야함
 
-### msal을 이용 인스턴스 만들기 api용
+### msal을 이용 인스턴스 만들기
 client_instance = msal.ConfidentialClientApplication(
     client_id=APPLICATION_ID,
     client_credential=CLIENT_SECRET,
     authority=authority_url
 )
-
-# ### 인증필요한 request_url받아오기 이젠 구지 필요 없음.
-# authorization_request_url = client_instance.get_authorization_request_url(SCOPES)   
 
 ### roct로 토큰 가져오기
 access_token = client_instance.acquire_token_by_username_password(
@@ -39,7 +37,7 @@ access_token = client_instance.acquire_token_by_username_password(
      password,
      scopes=SCOPES
 )
-### 가져온 토큰으로 헤더에 넣기
+### 가져온 accecss_token을 API용 헤더에 넣기
 access_token_id = access_token['access_token']
 headers = {
     'Authorization': 'Bearer ' + access_token_id,
@@ -47,60 +45,45 @@ headers = {
     'Content-Type' : 'application/json'
     }
 
-# #보낸는사람 #받는사람 #chat_sender는 김영남
-# for OFCName in idmatt.keys():
-#     #chat 생성하기 
-#     bd_chat_creat = {
-#         "chatType": "oneOnOne",
-#         "members": [
-#             {
-#                 "@odata.type": "#microsoft.graph.aadUserConversationMember",
-#                 "roles": [
-#                     "owner"
-#                 ],
-#                 "user@odata.bind": "https://graph.microsoft.com/v1.0/users('bbd521b3-17df-44f9-9461-0e4751e750a4')"
-#             },
-#             {
-#                 "@odata.type": "#microsoft.graph.aadUserConversationMember",
-#                 "roles": [
-#                     "owner"
-#                 ],
-#                 "user@odata.bind": "https://graph.microsoft.com/v1.0/users('')"
-#             }
-#         ]
-#     }
+####----------------------------------------------------------
+df2 = pd.read_excel('./Graph/a.xlsx')
+df2 = pd.DataFrame(df2)
+df2['최근입고일자'] = df2['최근입고일자'].dt.strftime('%y-%m-%d')
+df2['예상유통기한'] = df2['예상유통기한'].dt.strftime('%y-%m-%d')
 
-#     #### chat_sender 보내는 사람 설정하기
-#     bd_chat_creat['members'][1]['user@odata.bind'] = f"https://graph.microsoft.com/v1.0/users(\'{idmatt[OFCName]['id']}\')"
-#     ##### 보내는 메세지 json
+sendMessage = {}
+
+for idx, row in df2.iterrows():
+    if row['OFC'] not in sendMessage:
+        sendMessage[row['OFC']] = {}
+    if row['점포명'] not in sendMessage[row['OFC']]:
+        sendMessage[row['OFC']][row['점포명']] = f'[{row["점포명"]}]점 유통기한 경과 의심상품입니다.<br>'
+        sendMessage[row['OFC']][row['점포명']] += f"{'-'*10} <br>"
+    sendMessage[row['OFC']][row['점포명']] += f"+ {row['상품명']} : 재고({row['현재재고']}개)<br>"
+print(sendMessage)
 
 bd_message_send = {'body': {'contentType':'html','content': '메세지 TEST입니다.'}}
 
-# data_chat_creat = json.dumps(bd_chat_creat)
-
-
-import pandas as pd
-
-df = pd.read_excel('./Graph/a.xlsx')
-for idx, row in df.iterrows():
-    endpoint_message = base_url + 'chats/' + data[row.values[0]]['chat_id'] + '/messages'
-    bd_message_send['body']['content'] = f'{row.values[1]} <p> {row.values[2]}이다' 
-    print(bd_message_send)
-    data_message_send = json.dumps(bd_message_send)
-    response2 = requests.post(endpoint_message, data=data_message_send, headers=headers)
+for row in sendMessage.keys():
+    endpoint_message = base_url + 'chats/' + data[row]['chat_id'] + '/messages'
+    print(endpoint_message)
+    for row2 in sendMessage[row].keys():
+        bd_message_send['body']['content'] = sendMessage[row][row2]
+        print(bd_message_send)
+        data_message_send = json.dumps(bd_message_send)
+        response = requests.post(endpoint_message, data=data_message_send, headers=headers)
+        print(response.json())
 
 
 
 
-# # ### 챗 생성하기 requests.post
-#     endpoint = base_url + 'chats'
-#     response = requests.post(endpoint, data=data_chat_creat, headers=headers)
-#     idmatt[OFCName]['chat_id'] = response.json()['id']
-#     print(idmatt)
-#     time.sleep(5)
+# for idx, row in df.iterrows():
+#     endpoint_message = base_url + 'chats/' + data[row.values[0]]['chat_id'] + '/messages'
+#     bd_message_send['body']['content'] = f'{row.values[1]} <p> {row.values[2]}이다' 
+#     print(bd_message_send)
+#     data_message_send = json.dumps(bd_message_send)
+#     response2 = requests.post(endpoint_message, data=data_message_send, headers=headers)
 
-# with open('./Graph/memberinfo.json', 'w', encoding='utf-8') as wfile:
-#     json.dump(idmatt, wfile, indent=4)
 
 ### 메세지 보내기 requests.post 
 # for idx in data.keys():
