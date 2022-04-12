@@ -58,12 +58,13 @@ for idx, row in df2.iterrows():
         sendMessage[row['OFC']] = {}
     if row['점포명'] not in sendMessage[row['OFC']]:
         sendMessage[row['OFC']][row['점포명']] = f'[{row["점포명"]}]점 유통기한 경과 의심상품입니다.<br>'
-        sendMessage[row['OFC']][row['점포명']] += f"{'-'*10} <br>"
+        sendMessage[row['OFC']][row['점포명']] += f"{'-'*15} <br>"
     sendMessage[row['OFC']][row['점포명']] += f"+ {row['상품명']} : 재고({row['현재재고']}개)<br>"
 print(sendMessage)
 
 bd_message_send = {'body': {'contentType':'html','content': '메세지 TEST입니다.'}}
 
+# 
 for row in sendMessage.keys():
     endpoint_message = base_url + 'chats/' + data[row]['chat_id'] + '/messages'
     print(endpoint_message)

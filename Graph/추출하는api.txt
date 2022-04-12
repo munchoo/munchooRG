@@ -1,0 +1,17 @@
+
+# 추출하는 방법
+graph api를 이용하여 조직의 구성원 데이터 json으로 불러오기
+단 해당 권한은 graph Explorer에서는 진행되나, 
+api를 직접 이용해서는 권한요구가 안됨(Azure potal에서 요청을 했으나 권한 테넌트에 권한이 있음.
+https://graph.microsoft.com/v1.0/users?$count=true&$search="department:4부문3지역)"&$orderBy=displayName&$select=id,displayName,mail,givenName,department
+
+해당 쿼리를 통해 얻은 json을 meminfo2.json으로 복붙후 
+infoextrator.py를 이용해 멤버별 id를 추출
+chatCreat.py를 통해 멤버별 onoByOne 채팅을 생성함. 생성된 chatID는 memberinfo.json으로
+저장됨. 이 json파일을 memberinfo에 붙여넣기 하면 됨.
+
+전반적으로 메세지 보내는 실행파일은 graph_api_usepw.py 를 이용하시면 됩니다. 
+
+
+
+

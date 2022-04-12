@@ -1,6 +1,6 @@
 {
     "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users(id,displayName,mail,givenName,department)",
-    "@odata.count": 71,
+    "@odata.count": 76,
     "value": [
         {
             "id": "cca3694a-81db-4be9-9d8e-f5748b54e5d0",
@@ -21,6 +21,13 @@
             "displayName": "곽진수/4부문3지역)영업3팀",
             "mail": "gwack@gsretail.com",
             "givenName": "곽진수",
+            "department": "4부문3지역)영업3팀"
+        },
+        {
+            "id": "e9cf9ebb-3577-4cad-be72-f2953c3e026b",
+            "displayName": "김강인/4부문3지역)영업3팀",
+            "mail": "kangin85@gsretail.com",
+            "givenName": "김강인",
             "department": "4부문3지역)영업3팀"
         },
         {
@@ -185,6 +192,13 @@
             "department": "4부문3지역)영업5팀"
         },
         {
+            "id": "b0b597be-acde-45e4-9c36-55246e41bf8c",
+            "displayName": "박재범/4부문3지역)영업5팀",
+            "mail": "jaebeompark@gsretail.com",
+            "givenName": "박재범",
+            "department": "4부문3지역)영업5팀"
+        },
+        {
             "id": "4c74e699-3610-464b-b21c-bcda90e4d0da",
             "displayName": "배신태/4부문3지역)신규점팀",
             "mail": "bstae@gsretail.com",
@@ -224,13 +238,6 @@
             "displayName": "신인호/4부문3지역)영업5팀",
             "mail": "shinynho@gsretail.com",
             "givenName": "신인호",
-            "department": "4부문3지역)영업5팀"
-        },
-        {
-            "id": "25122baf-6fb0-4d18-a8f6-b67f9b5d8d05",
-            "displayName": "신현성/4부문3지역)영업5팀",
-            "mail": "shs841129@gsretail.com",
-            "givenName": "신현성",
             "department": "4부문3지역)영업5팀"
         },
         {
@@ -367,18 +374,25 @@
             "department": "4부문3지역)영업1팀"
         },
         {
-            "id": "9aa19903-6d78-48ee-b34d-5f8450c9b815",
-            "displayName": "이우성/4부문3지역)영업4팀",
-            "mail": "uksohun@gsretail.com",
-            "givenName": "이우성",
-            "department": "4부문3지역)영업4팀"
-        },
-        {
             "id": "f5572514-7c5f-46c9-bb75-9df57edacfa4",
             "displayName": "이정호/4부문3지역)개발1팀",
             "mail": "comodo@gsretail.com",
             "givenName": "이정호",
             "department": "4부문3지역)개발1팀"
+        },
+        {
+            "id": "12a49272-1f86-4cad-bb3c-ddb83e81876d",
+            "displayName": "이청용/4부문3지역)영업1팀",
+            "mail": "lcy6454@gsretail.com",
+            "givenName": "이청용",
+            "department": "4부문3지역)영업1팀"
+        },
+        {
+            "id": "e1044d84-e925-40e3-9042-16f9b34af85d",
+            "displayName": "임철만/4부문3지역)영업4팀",
+            "mail": "seowon@gsretail.com",
+            "givenName": "임철만",
+            "department": "4부문3지역)영업4팀"
         },
         {
             "id": "64b1910e-9500-4573-86ef-c6ea340947ea",
@@ -393,6 +407,13 @@
             "mail": "bobdogjang@gsretail.com",
             "givenName": "장현우",
             "department": "4부문3지역)영업1팀"
+        },
+        {
+            "id": "ab63e411-0410-42d4-ad04-cdd16a42f935",
+            "displayName": "정계영/4부문3지역)영업5팀",
+            "mail": "everwill7@gsretail.com",
+            "givenName": "정계영",
+            "department": "4부문3지역)영업5팀"
         },
         {
             "id": "60fed8c9-1227-4e12-aa64-e27b3c14c463",
@@ -465,6 +486,13 @@
             "department": "4부문3지역)영업5팀"
         },
         {
+            "id": "ec7e4d6e-7199-4b4a-9451-59112f67cff4",
+            "displayName": "채한올/4부문3지역)영업3팀",
+            "mail": "kinllzz@gsretail.com",
+            "givenName": "채한올",
+            "department": "4부문3지역)영업3팀"
+        },
+        {
             "id": "1c69255a-be7f-445f-b312-56bd3f822880",
             "displayName": "최광일/4부문3지역)개발1팀",
             "mail": "bravocki@gsretail.com",
@@ -477,6 +505,13 @@
             "mail": "utopia31@gsretail.com",
             "givenName": "최병권",
             "department": "4부문3지역)영업6팀"
+        },
+        {
+            "id": "5ec47e34-e5c6-4bea-8bec-e1a511e9f0b3",
+            "displayName": "최성혁/4부문3지역)영업1팀",
+            "mail": "choishh@gsretail.com",
+            "givenName": "최성혁",
+            "department": "4부문3지역)영업1팀"
         },
         {
             "id": "3e51174c-d882-4875-9ace-05b5671b4a71",

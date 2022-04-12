@@ -37,5 +37,5 @@ for idx, row in df.iterrows():
         sendMessage[row['OFC']][row['점포명']] = ''
     sendMessage[row['OFC']][row['점포명']] += f"상품 / {row['상품명']}"
 
-print(tabulate(sendMessage,sendMessage.values))
+print(tabulate(sendMessage,sendMessage.values4))
 
