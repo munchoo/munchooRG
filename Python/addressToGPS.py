@@ -23,10 +23,9 @@ root.withdraw()
 tkinter.messagebox.showinfo(title='정보', message='불러올 엑셀파일을 선택해주세요.\n컬럼구조는\n|점포코드|구주소|도로명주소|')
 dir_path = filedialog.askopenfilename()
 
-print(dir_path.name)
 
 # 주소목록
-data = pd.read_excel(dir_path.name, usecols='A,B,C,D,E',names=['점포코드','구주소','도로명주소','위도','경도'])
+data = pd.read_excel(dir_path, usecols='A,B,C,D,E',names=['점포코드','구주소','도로명주소','위도','경도'])
 
 data = data[data['위도'].isnull()]
 
