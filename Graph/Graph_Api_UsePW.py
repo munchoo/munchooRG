@@ -45,11 +45,40 @@ headers = {
     'Content-Type' : 'application/json'
     }
 
-####----------------------------------------------------------
-df2 = pd.read_excel('./Graph/a.xlsx')
+####-------------- 유통기한 메세지 -------------------------
+# df2 = pd.read_excel('./Graph/a.xlsx')
+# df2 = pd.DataFrame(df2)
+# df2['최근입고일자'] = df2['최근입고일자'].dt.strftime('%y-%m-%d')
+# df2['예상유통기한'] = df2['예상유통기한'].dt.strftime('%y-%m-%d')
+
+# sendMessage = {}
+
+# for idx, row in df2.iterrows():
+#     if row['OFC'] not in sendMessage:
+#         sendMessage[row['OFC']] = {}
+#     if row['점포명'] not in sendMessage[row['OFC']]:
+#         sendMessage[row['OFC']][row['점포명']] = f'[{row["점포명"]}]점 유통기한 경과 의심상품입니다.<br>'
+#         sendMessage[row['OFC']][row['점포명']] += f"{'-'*15} <br>"
+#     sendMessage[row['OFC']][row['점포명']] += f"+ {row['상품명']} : 재고({row['현재재고']}개)<br>"
+# print(sendMessage)
+
+# bd_message_send = {'body': {'contentType':'html','content': '메세지 TEST입니다.'}}
+
+# # 
+# for row in sendMessage.keys():
+#     endpoint_message = base_url + 'chats/' + data[row]['chat_id'] + '/messages'
+#     print(endpoint_message)
+#     for row2 in sendMessage[row].keys():
+#         bd_message_send['body']['content'] = sendMessage[row][row2]
+#         print(bd_message_send)
+#         data_message_send = json.dumps(bd_message_send)
+#         response = requests.post(endpoint_message, data=data_message_send, headers=headers)
+#         print(response.json())
+
+
+####-----------다른메세지 보내기------------------------------
+df2 = pd.read_excel('./Graph/d.xlsx')
 df2 = pd.DataFrame(df2)
-df2['최근입고일자'] = df2['최근입고일자'].dt.strftime('%y-%m-%d')
-df2['예상유통기한'] = df2['예상유통기한'].dt.strftime('%y-%m-%d')
 
 sendMessage = {}
 
@@ -57,9 +86,9 @@ for idx, row in df2.iterrows():
     if row['OFC'] not in sendMessage:
         sendMessage[row['OFC']] = {}
     if row['점포명'] not in sendMessage[row['OFC']]:
-        sendMessage[row['OFC']][row['점포명']] = f'[{row["점포명"]}]점 유통기한 경과 의심상품입니다.<br>'
+        sendMessage[row['OFC']][row['점포명']] = f'[{row["점포명"]}] 6월 GS Pay 사용현황 <br>'
         sendMessage[row['OFC']][row['점포명']] += f"{'-'*15} <br>"
-    sendMessage[row['OFC']][row['점포명']] += f"+ {row['상품명']} : 재고({row['현재재고']}개)<br>"
+        sendMessage[row['OFC']][row['점포명']] += f"{row['메시지']}"
 print(sendMessage)
 
 bd_message_send = {'body': {'contentType':'html','content': '메세지 TEST입니다.'}}
@@ -74,7 +103,6 @@ for row in sendMessage.keys():
         data_message_send = json.dumps(bd_message_send)
         response = requests.post(endpoint_message, data=data_message_send, headers=headers)
         print(response.json())
-
 
 
 

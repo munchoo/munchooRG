@@ -1,6 +1,4 @@
-SELECT  
-          Z.DATECD
-        , Z.STORECD
+SELECT  Z.STORECD
         , SUBSTR(Z.STORENM,1,INSTR(Z.STORENM,'(')-1) STORENM
         , Z.RGNCD
         , Z.RGNNM      
@@ -18,7 +16,6 @@ SELECT
         END 매출목표 
 FROM (
             SELECT 
-                A.DATECD,
                 B.STORECD AS STORECD,
                 B.STORENM AS STORENM,
                 C.TEAMCD           AS TEAMCD,
@@ -30,7 +27,7 @@ FROM (
                 A.NTSAL_GBCD,        
                 CASE WHEN A.NTSAL_GBCD = '01' THEN '일반상품매출'
                     WHEN A.NTSAL_GBCD = '02' THEN 'F/F'
-                    WHEN A.NTSAL_GBCD = '03' THEN '일매출'
+                    when A.NTSAL_GBCD = '03' THEN '일매출'
                     WHEN A.NTSAL_GBCD = '05' THEN '농/축/수산식품'
                     WHEN A.NTSAL_GBCD = '08' THEN 'CAFE25'
                     WHEN A.NTSAL_GBCD = '09' THEN '치킨25'
@@ -84,7 +81,6 @@ FROM (
                 AND ( TO_CHAR(B.CLOSEDT,'YYYYMM') <> Y.CUR_MON OR B.CLOSEDT IS NULL )
                 -- AND ( (A.NTSAL_GBCD IN  ('01', '02', '05', '08', '09', '11', '12', '13', '14') AND A.PLNSAL_AMT >0 )) 
         GROUP BY 
-            A.DATECD,
             B.STORECD,
             B.STORENM,
             C.TEAMCD,
@@ -97,7 +93,4 @@ FROM (
             C.TEAM_DIST_SEQ
     ) Z
     where Z.RGNCD in ('54')
-    ORDER BY  STORECD, DATECD, RGNCD, TEAMCD , PART_SH , TEAM_SEQ
-
-
-    
+    ORDER BY  STORECD,  RGNCD, TEAMCD , PART_SH , TEAM_SEQ

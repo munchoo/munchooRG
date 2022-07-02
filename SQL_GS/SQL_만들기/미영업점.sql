@@ -7,7 +7,8 @@ with	 Header as
 		join	LGMJVDP.TB_STORE_DM	a12
 		  on 	(substr(a11.ORIGIN_BIZPL_CD,2,4) = a12.STORECD)
 	where	(a12.RGNCD in ('54')
-	 and SUBSTR(a11.OPER_DT,1,4)||'-'||SUBSTR(a11.OPER_DT,5,2)||'-'||SUBSTR(a11.OPER_DT,7,2) in ('2022-06-15', '2022-06-14', '2022-06-13', '2022-06-12', '2022-06-11')
+	 -- and SUBSTR(a11.OPER_DT,1,4)||'-'||SUBSTR(a11.OPER_DT,5,2)||'-'||SUBSTR(a11.OPER_DT,7,2) in ('2022-06-15', '2022-06-14', '2022-06-13', '2022-06-12', '2022-06-11')
+	 and a11.OPER_DT between to_char(sysdate-8, 'YYYYMMDD') and to_char(sysdate-1, 'YYYYMMDD')
 	 and a11.SALE_HR in ('01', '02', '03', '04', '05', '06'))
 	group by	substr(a11.ORIGIN_BIZPL_CD,2,4),
 		a11.SALE_HR,
