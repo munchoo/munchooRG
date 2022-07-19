@@ -22,6 +22,7 @@ def mergePresentations(inputFileNames, outputFileName):
 #           to new file named "allSildesMerged.pptx" in the same folder
 
 file_dir = input('파일경로를 입력해주세요.:')
+# file_dir = 'D:\영업지원\4_영업공유회의\220718'
 path,_,files = next(walk(file_dir))
 outputFileName = path + '\\' + 'allSildesMerged.pptx'
 inputFiles = []

@@ -82,18 +82,25 @@ df2 = pd.DataFrame(df2)
 
 sendMessage = {}
 
+## pandas로 받는 Dataframe파일을 반복문으로 딕셔너리형태로 메세지화 한다.
+## {'OFC명':{'점포명':'메세지1','점포명2':'메세지2','점포명3':'메세지3'}}
+
 for idx, row in df2.iterrows():
     if row['OFC'] not in sendMessage:
         sendMessage[row['OFC']] = {}
     if row['점포명'] not in sendMessage[row['OFC']]:
-        sendMessage[row['OFC']][row['점포명']] = f'[{row["점포명"]}] 6월 GS Pay 사용현황 <br>'
+        sendMessage[row['OFC']][row['점포명']] = f'[{row["점포명"]}] 7월 김밥 레벨업 행사 안내 <br>'
         sendMessage[row['OFC']][row['점포명']] += f"{'-'*15} <br>"
         sendMessage[row['OFC']][row['점포명']] += f"{row['메시지']}"
 print(sendMessage)
 
-bd_message_send = {'body': {'contentType':'html','content': '메세지 TEST입니다.'}}
 
-# 
+## msal로 보내기전 json 형태의 빈 딕셔너리를 하나 만들어준다 
+## msal의 Json - {'body':{'contentType':'html','content':'메세지'}}
+## 중간에 딕셔너리형태를 Json.dumps로 json형태로 변환
+# https://graph.microsoft.com/v1.0/chats/19:bbd521b3-17df-44f9-9461-0e4751e750a4_dc6321ca-2f64-41fe-aa20-8d1f28465edd@unq.gbl.spaces/messages
+
+bd_message_send = {'body': {'contentType':'html','content': '메세지 TEST입니다.'}}
 for row in sendMessage.keys():
     endpoint_message = base_url + 'chats/' + data[row]['chat_id'] + '/messages'
     print(endpoint_message)
@@ -103,6 +110,8 @@ for row in sendMessage.keys():
         data_message_send = json.dumps(bd_message_send)
         response = requests.post(endpoint_message, data=data_message_send, headers=headers)
         print(response.json())
+        ## 지연이 없으면 too many send msg 에러가 나온다. ('22년 6월 2일)
+        time.sleep(2)
 
 
 
@@ -119,4 +128,3 @@ for row in sendMessage.keys():
 #     endpoint_message = base_url + 'chats/' + data[idx]['chat_id'] + '/messages'
 #     response2 = requests.post(endpoint_message, data=data_message_send, headers=headers)
 
-# https://graph.microsoft.com/v1.0/chats/19:bbd521b3-17df-44f9-9461-0e4751e750a4_dc6321ca-2f64-41fe-aa20-8d1f28465edd@unq.gbl.spaces/messages
