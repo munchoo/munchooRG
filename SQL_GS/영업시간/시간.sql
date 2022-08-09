@@ -1,0 +1,50 @@
+with	 gopa1 as
+ (select	substr(a11.ORIGIN_BIZPL_CD,2,4)  STORECD,
+		a11.SALE_HR  SALE_HR,
+		SUBSTR(a11.OPER_DT,1,4)||'-'||SUBSTR(a11.OPER_DT,5,2)||'-'||SUBSTR(a11.OPER_DT,7,2)  DATECD,
+		sum(a11.NET_SALE_AMT)  WJXBFS1
+	from	LGMJVDP.TS_SL_TIME_CUST_SALE	a11
+		join	LGMJVDP.TB_DATE_DM	a12
+		  on 	(SUBSTR(a11.OPER_DT,1,4)||'-'||SUBSTR(a11.OPER_DT,5,2)||'-'||SUBSTR(a11.OPER_DT,7,2) = a12.DATECD)
+		join	LGMJVDP.TB_STORE_DM	a13
+		  on 	(substr(a11.ORIGIN_BIZPL_CD,2,4) = a13.STORECD)
+	where	(a13.RGNCD in ('54')
+	 and a12.YMCD in ('202207', '202206', '202205', '202204', '202203', '202202', '202201', '202112', '202111', '202110', '202109', '202108')
+	 and a11.SALE_HR in ('00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23')
+	 and substr(a11.ORIGIN_BIZPL_CD,2,4) in ('U388 '))
+	group by	substr(a11.ORIGIN_BIZPL_CD,2,4),
+		a11.SALE_HR,
+		SUBSTR(a11.OPER_DT,1,4)||'-'||SUBSTR(a11.OPER_DT,5,2)||'-'||SUBSTR(a11.OPER_DT,7,2)
+	), 
+	 gopa2 as
+ (select	a11.STORECD  STORECD,
+		a11.DATECD  DATECD,
+		sum(a11.SALDT_CNT)  WJXBFS1
+	from	LGMJVDP.TB_SALDT_FT	a11
+		join	LGMJVDP.TB_DATE_DM	a12
+		  on 	(a11.DATECD = a12.DATECD)
+		join	LGMJVDP.TB_STORE_DM	a13
+		  on 	(a11.STORECD = a13.STORECD)
+	where	(a13.RGNCD in ('54')
+	 and a12.YMCD in ('202207', '202206', '202205', '202204', '202203', '202202', '202201', '202112', '202111', '202110', '202109', '202108')
+	 and a11.STORECD in ('U388 '))
+	group by	a11.STORECD,
+		a11.DATECD
+	)
+select	distinct pa11.STORECD  STORECD,
+	SUBSTR(a14.STORENM,1,INSTR(a14.STORENM,'(')-1 )  STORENM,
+	'V'||SUBSTR(a14.STORENM,INSTR(a14.STORENM,'(')+1, -( INSTR(a14.STORENM,'(') -INSTR(a14.STORENM,':'))-1)  CustCol_31,
+	a13.YMCD  YMCD,
+	pa11.SALE_HR  SALE_HR,
+	pa11.DATECD  DATECD,
+	pa11.WJXBFS1  WJXBFS1,
+	pa12.WJXBFS1  WJXBFS2
+from	gopa1	pa11
+	left outer join	gopa2	pa12
+	  on 	(pa11.DATECD = pa12.DATECD and 
+	pa11.STORECD = pa12.STORECD)
+	join	LGMJVDP.TB_DATE_DM	a13
+	  on 	(pa11.DATECD = a13.DATECD)
+	join	LGMJVDP.TB_STORE_DM	a14
+	  on 	(pa11.STORECD = a14.STORECD)
+

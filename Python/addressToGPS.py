@@ -34,7 +34,7 @@ print(data.head(10))
 # api이용 좌표 찾기
 
 geo_coordi = []
-
+  
 for add  in data['도로명주소']:
     add_urlenc = parse.quote(add)
     url = api_url + add_urlenc
