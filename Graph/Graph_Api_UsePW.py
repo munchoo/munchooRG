@@ -74,10 +74,9 @@ headers = {
 #         data_message_send = json.dumps(bd_message_send)
 #         response = requests.post(endpoint_message, data=data_message_send, headers=headers)
 #         print(response.json())
-
-
 ####-----------다른메세지 보내기------------------------------
-df2 = pd.read_excel('./Graph/d.xlsx')
+
+df2 = pd.read_excel('./Graph/send_message.xlsx')
 df2 = pd.DataFrame(df2)
 
 sendMessage = {}
@@ -89,7 +88,7 @@ for idx, row in df2.iterrows():
     if row['OFC'] not in sendMessage:
         sendMessage[row['OFC']] = {}
     if row['점포명'] not in sendMessage[row['OFC']]:
-        sendMessage[row['OFC']][row['점포명']] = f'[{row["점포명"]}] 7월 김밥 레벨업 행사 안내 <br>'
+        sendMessage[row['OFC']][row['점포명']] = f'[{row["점포명"]}] 8월 김밥 레벨업 행사 안내 <br>'
         sendMessage[row['OFC']][row['점포명']] += f"{'-'*15} <br>"
         sendMessage[row['OFC']][row['점포명']] += f"{row['메시지']}"
 print(sendMessage)
@@ -113,8 +112,6 @@ for row in sendMessage.keys():
         ## 지연이 없으면 too many send msg 에러가 나온다. ('22년 6월 2일)
         time.sleep(2)
 
-
-
 # for idx, row in df.iterrows():
 #     endpoint_message = base_url + 'chats/' + data[row.values[0]]['chat_id'] + '/messages'
 #     bd_message_send['body']['content'] = f'{row.values[1]} <p> {row.values[2]}이다' 
@@ -127,4 +124,3 @@ for row in sendMessage.keys():
 # for idx in data.keys():
 #     endpoint_message = base_url + 'chats/' + data[idx]['chat_id'] + '/messages'
 #     response2 = requests.post(endpoint_message, data=data_message_send, headers=headers)
-

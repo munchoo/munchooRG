@@ -13,5 +13,13 @@ chatCreat.py를 통해 멤버별 onoByOne 채팅을 생성함. 생성된 chatID�
 전반적으로 메세지 보내는 실행파일은 graph_api_usepw.py 를 이용하시면 됩니다. 
 
 
+graph Explorer에서 users의 request header에 아래 값을 넣어야지만 query가 실햄됨
 
+Key : consistencyLevel
+Value : eventure
 
+쿼리실행 후 meminfo2에 id가 저장됨. 
+
+chatCreat.py를 통해서 멤버들과 채팅 채널을 생성, 생성된 chatid는 memberinfo.json에 기록됨.
+실질적으로 보내는 graph_api_usepw.py에서는 meminfo.json을 사용함. 
+*** memberinfo 에서 meminfo로 수동으로 이동 해주세요.

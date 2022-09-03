@@ -1,6 +1,6 @@
 {
     "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users(id,displayName,mail,givenName,department)",
-    "@odata.count": 76,
+    "@odata.count": 77,
     "value": [
         {
             "id": "cca3694a-81db-4be9-9d8e-f5748b54e5d0",
@@ -60,10 +60,10 @@
         },
         {
             "id": "c62af9cd-32e4-4344-bb58-8d326a06a9f6",
-            "displayName": "김동관/4부문3지역)개발2팀",
+            "displayName": "김동관/4부문3지역)개발1팀",
             "mail": "genius0505@gsretail.com",
             "givenName": "김동관",
-            "department": "4부문3지역)개발2팀"
+            "department": "4부문3지역)개발1팀"
         },
         {
             "id": "d457ca6d-34a1-473c-a458-a9c71de40548",
@@ -127,13 +127,6 @@
             "mail": "yeaji25@gsretail.com",
             "givenName": "김예지",
             "department": "4부문3지역)영업2팀"
-        },
-        {
-            "id": "26cc9d33-36ba-432f-aaee-e147f281329e",
-            "displayName": "김용규/4부문3지역)영업3팀",
-            "mail": "apfhd5315@gsretail.com",
-            "givenName": "김용규",
-            "department": "4부문3지역)영업3팀"
         },
         {
             "id": "6dc98769-f207-43b9-b2f8-487d7eae7f3e",
@@ -227,11 +220,11 @@
             "department": "4부문3지역)영업3팀"
         },
         {
-            "id": "5b1b5267-a5ab-4d90-871f-88a4e977c48e",
-            "displayName": "신수호/4부문3지역)영업2팀",
-            "mail": "soohoshin@gsretail.com",
-            "givenName": "신수호",
-            "department": "4부문3지역)영업2팀"
+            "id": "6c0f7302-aed6-42d4-afab-0a60c1d21f20",
+            "displayName": "신연호/4부문3지역)영업6팀",
+            "mail": "salmon421@gsretail.com",
+            "givenName": "신연호",
+            "department": "4부문3지역)영업6팀"
         },
         {
             "id": "eb46226f-734b-4ad6-8844-2f3326c91350",
@@ -416,6 +409,13 @@
             "department": "4부문3지역)영업5팀"
         },
         {
+            "id": "92e1ebdc-a3b6-4c85-8b22-a159f13fefc1",
+            "displayName": "정성연/4부문3지역)영업2팀",
+            "mail": "newjeong@gsretail.com",
+            "givenName": "정성연",
+            "department": "4부문3지역)영업2팀"
+        },
+        {
             "id": "60fed8c9-1227-4e12-aa64-e27b3c14c463",
             "displayName": "정영로/4부문3지역)영업1팀",
             "mail": "jungyr@gsretail.com",
@@ -472,6 +472,13 @@
             "department": "4부문3지역)영업4팀"
         },
         {
+            "id": "7517472f-4ed1-40d5-abe0-8a2a3e32a0a9",
+            "displayName": "조주원/4부문3지역)영업4팀",
+            "mail": "juwonjo@gsretail.com",
+            "givenName": "조주원",
+            "department": "4부문3지역)영업4팀"
+        },
+        {
             "id": "a13e3be4-4d80-4dbd-bf17-742686654b3c",
             "displayName": "주장호/4부문3지역)개발2팀",
             "mail": "jjh8554@gsretail.com",
@@ -501,17 +508,17 @@
         },
         {
             "id": "adb06094-ff90-4b8b-9604-b246f6927710",
-            "displayName": "최병권/4부문3지역)영업6팀",
+            "displayName": "최병권/4부문3지역)신규점팀",
             "mail": "utopia31@gsretail.com",
             "givenName": "최병권",
-            "department": "4부문3지역)영업6팀"
+            "department": "4부문3지역)신규점팀"
         },
         {
             "id": "5ec47e34-e5c6-4bea-8bec-e1a511e9f0b3",
-            "displayName": "최성혁/4부문3지역)영업1팀",
+            "displayName": "최성혁/4부문3지역)영업2팀",
             "mail": "choishh@gsretail.com",
             "givenName": "최성혁",
-            "department": "4부문3지역)영업1팀"
+            "department": "4부문3지역)영업2팀"
         },
         {
             "id": "3e51174c-d882-4875-9ace-05b5671b4a71",

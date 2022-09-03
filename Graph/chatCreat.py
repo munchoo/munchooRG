@@ -83,7 +83,7 @@ for OFCName in data.keys():
     response = requests.post(endpoint, data=data_chat_creat, headers=headers)
     data[OFCName]['chat_id'] = response.json()['id']
     print(OFCName)
-    time.sleep(5)
+    time.sleep(3)
 
 with open('./Graph/memberinfo.json', 'w', encoding='utf-8') as wfile:
     json.dump(data, wfile, indent=4)

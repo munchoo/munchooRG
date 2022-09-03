@@ -43,10 +43,6 @@
         "id": "d22b8001-8725-4ad3-ae0f-e8a1fc174938",
         "chat_id": "19:bbd521b3-17df-44f9-9461-0e4751e750a4_d22b8001-8725-4ad3-ae0f-e8a1fc174938@unq.gbl.spaces"
     },
-    "\uae40\uc0c1\ubc30": {
-        "id": "a9c7800d-0ea7-4384-8806-825f492d32fd",
-        "chat_id": "19:a9c7800d-0ea7-4384-8806-825f492d32fd_bbd521b3-17df-44f9-9461-0e4751e750a4@unq.gbl.spaces"
-    },
     "\uae40\uc0c1\uc900": {
         "id": "fc37eda8-bac5-49de-ad4c-bc19b58f8884",
         "chat_id": "19:bbd521b3-17df-44f9-9461-0e4751e750a4_fc37eda8-bac5-49de-ad4c-bc19b58f8884@unq.gbl.spaces"
@@ -70,10 +66,6 @@
     "\uae40\uc608\uc9c0": {
         "id": "36580fc4-898a-4330-8b32-5dcd766fefaa",
         "chat_id": "19:36580fc4-898a-4330-8b32-5dcd766fefaa_bbd521b3-17df-44f9-9461-0e4751e750a4@unq.gbl.spaces"
-    },
-    "\uae40\uc6a9\uaddc": {
-        "id": "26cc9d33-36ba-432f-aaee-e147f281329e",
-        "chat_id": "19:26cc9d33-36ba-432f-aaee-e147f281329e_bbd521b3-17df-44f9-9461-0e4751e750a4@unq.gbl.spaces"
     },
     "\uae40\uc6b0\ud604": {
         "id": "6dc98769-f207-43b9-b2f8-487d7eae7f3e",
@@ -127,9 +119,9 @@
         "id": "8eabf199-3aea-4eb2-9f0f-10f4b003e703",
         "chat_id": "19:8eabf199-3aea-4eb2-9f0f-10f4b003e703_bbd521b3-17df-44f9-9461-0e4751e750a4@unq.gbl.spaces"
     },
-    "\uc2e0\uc218\ud638": {
-        "id": "5b1b5267-a5ab-4d90-871f-88a4e977c48e",
-        "chat_id": "19:5b1b5267-a5ab-4d90-871f-88a4e977c48e_bbd521b3-17df-44f9-9461-0e4751e750a4@unq.gbl.spaces"
+    "\uc2e0\uc5f0\ud638": {
+        "id": "6c0f7302-aed6-42d4-afab-0a60c1d21f20",
+        "chat_id": "19:6c0f7302-aed6-42d4-afab-0a60c1d21f20_bbd521b3-17df-44f9-9461-0e4751e750a4@unq.gbl.spaces"
     },
     "\uc2e0\uc778\ud638": {
         "id": "eb46226f-734b-4ad6-8844-2f3326c91350",
@@ -235,6 +227,10 @@
         "id": "ab63e411-0410-42d4-ad04-cdd16a42f935",
         "chat_id": "19:ab63e411-0410-42d4-ad04-cdd16a42f935_bbd521b3-17df-44f9-9461-0e4751e750a4@unq.gbl.spaces"
     },
+    "\uc815\uc131\uc5f0": {
+        "id": "92e1ebdc-a3b6-4c85-8b22-a159f13fefc1",
+        "chat_id": "19:92e1ebdc-a3b6-4c85-8b22-a159f13fefc1_bbd521b3-17df-44f9-9461-0e4751e750a4@unq.gbl.spaces"
+    },
     "\uc815\uc601\ub85c": {
         "id": "60fed8c9-1227-4e12-aa64-e27b3c14c463",
         "chat_id": "19:60fed8c9-1227-4e12-aa64-e27b3c14c463_bbd521b3-17df-44f9-9461-0e4751e750a4@unq.gbl.spaces"
@@ -266,6 +262,10 @@
     "\uc815\ud64d\uade0": {
         "id": "6fbb0145-64f4-4349-ab91-06c97a12877f",
         "chat_id": "19:6fbb0145-64f4-4349-ab91-06c97a12877f_bbd521b3-17df-44f9-9461-0e4751e750a4@unq.gbl.spaces"
+    },
+    "\uc870\uc8fc\uc6d0": {
+        "id": "7517472f-4ed1-40d5-abe0-8a2a3e32a0a9",
+        "chat_id": "19:7517472f-4ed1-40d5-abe0-8a2a3e32a0a9_bbd521b3-17df-44f9-9461-0e4751e750a4@unq.gbl.spaces"
     },
     "\uc8fc\uc7a5\ud638": {
         "id": "a13e3be4-4d80-4dbd-bf17-742686654b3c",
@@ -302,5 +302,9 @@
     "\ud669\uc720\uc9c0": {
         "id": "d29eba92-9777-4048-822e-b23bf6cb8f0b",
         "chat_id": "19:bbd521b3-17df-44f9-9461-0e4751e750a4_d29eba92-9777-4048-822e-b23bf6cb8f0b@unq.gbl.spaces"
+    },
+    "\uae40\uc0c1\ubc30": {
+        "id": "a9c7800d-0ea7-4384-8806-825f492d32fd",
+        "chat_id": "19:a9c7800d-0ea7-4384-8806-825f492d32fd_bbd521b3-17df-44f9-9461-0e4751e750a4@unq.gbl.spaces"
     }
 }
