@@ -1,0 +1,57 @@
+WITH HEADER AS(
+SELECT    OPER_DT 
+     ,    ORIGIN_BIZPL_CD
+     ,    POS_NO
+     ,    SALE_SEQ
+  FROM    GSSCODS.TS_TR_HEADER A
+  JOIN    LGMJVDP.TB_STORE_DM B
+    ON    SUBSTR(A.ORIGIN_BIZPL_CD,2,4) = B.STORECD
+   AND    B.TEAMCD IN ('4104')
+     
+ WHERE    OPER_DT BETWEEN REPLACE('2022-10-05','-','')  AND REPLACE('2022-10-06','-','')
+   AND    DEAL_SP IN ('01', '33', '61' , '50')
+ GROUP BY OPER_DT 
+     ,    ORIGIN_BIZPL_CD
+     ,    POS_NO
+     ,    SALE_SEQ
+)
+SELECT    SUBSTR(A.OPER_DT, 1, 6) AS "년월"
+     ,    A.TENDER_CD AS 결제수단코드
+     ,    C.ETC_CD_NM AS 결제수단명
+     ,    SUM(CASE WHEN A.NOR_CANCEL_SP = '0' THEN 1 WHEN A.NOR_CANCEL_SP = '9' THEN 0 END)  AS 정상건수
+     ,    SUM(CASE WHEN A.NOR_CANCEL_SP = '0' THEN 0 WHEN A.NOR_CANCEL_SP = '9' THEN -1 END)  AS 취소건수
+     ,    SUM(CASE WHEN A.NOR_CANCEL_SP = '0' THEN 1 WHEN A.NOR_CANCEL_SP = '9' THEN -1 END)  AS 전체건수
+     ,    SUM(CASE WHEN A.NOR_CANCEL_SP = '0' THEN A.TENDER_AMT - A.CHANGE WHEN A.NOR_CANCEL_SP = '9' THEN 0 END)  AS 정상금액
+     ,    SUM(CASE WHEN A.NOR_CANCEL_SP = '0' THEN 0 WHEN A.NOR_CANCEL_SP = '9' THEN A.TENDER_AMT - A.CHANGE END)  AS 취소금액
+     ,    SUM(A.TENDER_AMT - A.CHANGE) AS 전체금액
+  FROM    GSSCODS.TS_TR_TENDER A
+  JOIN    HEADER Z
+    ON    A.OPER_DT = Z.OPER_DT
+   AND    A.ORIGIN_BIZPL_CD = Z.ORIGIN_BIZPL_CD
+   AND    A.POS_NO = Z.POS_NO
+   AND    A.SALE_SEQ = Z.SALE_SEQ
+  JOIN    LGMJVDP.TB_STORE_DM B
+    ON    SUBSTR(A.ORIGIN_BIZPL_CD,2,4) = B.STORECD
+  LEFT    OUTER JOIN (
+             SELECT    B.ETC_CD
+                  ,    B.ETC_CD_NM
+               FROM    GSSCODS.TS_MS_ETC_CD A
+               JOIN    GSSCODS.TS_MS_ETC_CD_DETAIL B
+                 ON    A.ETC_CLASS_CD  = B.ETC_CLASS_CD
+              WHERE    A.ETC_CLASS_CD ='PM02'
+          )  C
+    ON    A.TENDER_CD =  C.ETC_CD
+ WHERE    A.OPER_DT BETWEEN REPLACE('2022-10-05','-','')  AND REPLACE('2022-10-06','-','')
+   AND    B.TEAMCD IN ('4104')
+     
+ GROUP BY SUBSTR(A.OPER_DT, 1, 6)
+     ,    A.TENDER_CD
+     ,    C.ETC_CD_NM
+ ORDER BY SUBSTR(A.OPER_DT, 1, 6)
+     ,    A.TENDER_CD
+WITH UR
+
+
+[분석엔진 계산 단계:
+	1.  cross-tabbing 수행
+]
