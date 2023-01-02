@@ -20,7 +20,7 @@ CLIENT_SECRET = '6SH7Q~-bKmoBmiVopd-sRv6cjKwQd-HB9g2GL'
 authority_url = 'https://login.microsoftonline.com/gsretail.co.kr'
 base_url = 'https://graph.microsoft.com/v1.0/'
 username = "munchoo@gsretail.com"
-password = "dud5@ska2"
+password = "dud5@ska1"
 SCOPES = ['User.Read', 'Chat.ReadWrite', 'Chat.Create']  ### permmition 불러오기 azure portal에서 등록해야함
 
 ### msal을 이용 인스턴스 만들기 api용
@@ -30,7 +30,7 @@ client_instance = msal.ConfidentialClientApplication(
     authority=authority_url
 )
 
-# ### 인증필요한 request_url받아오기 이젠 구지 필요 없음.
+# ### 인증필요한 request_url받아오기 이젠 굳이 필요 없음.
 # authorization_request_url = client_instance.get_authorization_request_url(SCOPES)   
 
 ### roct로 토큰 가져오기
@@ -83,7 +83,7 @@ for OFCName in data.keys():
     response = requests.post(endpoint, data=data_chat_creat, headers=headers)
     data[OFCName]['chat_id'] = response.json()['id']
     print(OFCName)
-    time.sleep(3)
+    time.sleep(1)
 
 with open('./Graph/memberinfo.json', 'w', encoding='utf-8') as wfile:
     json.dump(data, wfile, indent=4)

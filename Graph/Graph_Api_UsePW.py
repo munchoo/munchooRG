@@ -21,7 +21,7 @@ CLIENT_SECRET = '6SH7Q~-bKmoBmiVopd-sRv6cjKwQd-HB9g2GL'
 authority_url = 'https://login.microsoftonline.com/gsretail.co.kr'
 base_url = 'https://graph.microsoft.com/v1.0/'
 username = "munchoo@gsretail.com"
-password = "dud5@ska2"
+password = "dud5@ska1"
 SCOPES = ['User.Read', 'Chat.ReadWrite', 'Chat.Create']  ### permmition 불러오기 azure portal에서 등록해야함
 
 ### msal을 이용 인스턴스 만들기
@@ -88,11 +88,13 @@ for idx, row in df2.iterrows():
     if row['OFC'] not in sendMessage:
         sendMessage[row['OFC']] = {}
     if row['점포명'] not in sendMessage[row['OFC']]:
+        # 제목줄 만들기
         sendMessage[row['OFC']][row['점포명']] = f'[{row["점포명"]}] 8월 김밥 레벨업 행사 안내 <br>'
+        # 대쉬바로 구분선 설정하기 
         sendMessage[row['OFC']][row['점포명']] += f"{'-'*15} <br>"
+        # 엑셀로 불로온 데이터 메세지 넣기 (html 방식으로 <br> 줄넘기기)
         sendMessage[row['OFC']][row['점포명']] += f"{row['메시지']}"
 print(sendMessage)
-
 
 ## msal로 보내기전 json 형태의 빈 딕셔너리를 하나 만들어준다 
 ## msal의 Json - {'body':{'contentType':'html','content':'메세지'}}
@@ -101,16 +103,17 @@ print(sendMessage)
 
 bd_message_send = {'body': {'contentType':'html','content': '메세지 TEST입니다.'}}
 for row in sendMessage.keys():
-    endpoint_message = base_url + 'chats/' + data[row]['chat_id'] + '/messages'
-    print(endpoint_message)
-    for row2 in sendMessage[row].keys():
-        bd_message_send['body']['content'] = sendMessage[row][row2]
-        print(bd_message_send)
-        data_message_send = json.dumps(bd_message_send)
-        response = requests.post(endpoint_message, data=data_message_send, headers=headers)
-        print(response.json())
-        ## 지연이 없으면 too many send msg 에러가 나온다. ('22년 6월 2일)
-        time.sleep(2)
+    if row in data:
+        endpoint_message = base_url + 'chats/' + data[row]['chat_id'] + '/messages'
+        print(endpoint_message)
+        for row2 in sendMessage[row].keys():
+            bd_message_send['body']['content'] = sendMessage[row][row2]
+            print(bd_message_send)
+            data_message_send = json.dumps(bd_message_send)
+            # response = requests.post(endpoint_message, data=data_message_send, headers=headers)
+            # print(response.json())
+            ## too many send msg 에러 방지를 위해 지연 추가. ('22년 6월 2일)
+            time.sleep(2)
 
 # for idx, row in df.iterrows():
 #     endpoint_message = base_url + 'chats/' + data[row.values[0]]['chat_id'] + '/messages'
