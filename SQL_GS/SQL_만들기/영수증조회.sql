@@ -10,7 +10,7 @@ SELECT    A.OPER_DT
      ,    TO_CHAR(A.SALE_END_DTTM, 'HH24') AS TIME_CD
      ,    A.SALE_END_DTTM
   FROM    GSSCODS.TS_TR_HEADER A
- WHERE    A.OPER_DT BETWEEN REPLACE('2022-08-01','-','') AND REPLACE('2022-08-08','-','')
+ WHERE    A.OPER_DT BETWEEN REPLACE('2023-04-14','-','') AND REPLACE('2023-04-14','-','')
    AND    A.DEAL_SP IN ('01','33')  --정상판매 , 기프트콘
   
 )
@@ -41,10 +41,10 @@ SELECT    A.OPER_DT
   JOIN    LGMJVDP.TB_STORE_DM  C
     ON    SUBSTR(A.ORIGIN_BIZPL_CD,2,4) = C.STORECD
 
- WHERE    A.OPER_DT BETWEEN REPLACE('2022-08-01','-','') AND REPLACE('2022-08-08','-','')
+ WHERE    A.OPER_DT BETWEEN REPLACE('2023-04-14','-','') AND REPLACE('2023-04-14','-','')
    AND    A.SALE_SP IN ('1', '2')  --장상판매 , 고객반품
    AND    A.SKU_CANCEL_YN   =  'N'
-   AND    A.GOODS_CD IN ('2800100160431')   
+   AND    C.STORECD in ('R372')   
   
  GROUP BY A.OPER_DT
      ,    C.RGN_GRPNM
@@ -64,6 +64,8 @@ SELECT    A.OPER_DT
 
 SELECT    A.RGN_GRPNM  AS 부문명
      ,    A.RGNNM      AS 지역명
+     ,    B.SALE_SEQ    AS 판매순서
+     ,    B.RECEIPT_NO   AS 영수증번호
      ,    A.TEAM_LN    AS 팀명
      ,    A.PART_LN    AS OFC명
      ,    A.ORIGIN_BIZPL_CD AS 최초점포코드
@@ -87,6 +89,8 @@ SELECT    A.RGN_GRPNM  AS 부문명
 
  GROUP BY A.RGN_GRPNM
      ,    A.RGNNM
+     ,    B.SALE_SEQ
+     ,    B.RECEIPT_NO
      ,    A.TEAM_LN
      ,    A.PART_LN
      ,    A.ORIGIN_BIZPL_CD
@@ -96,3 +100,5 @@ SELECT    A.RGN_GRPNM  AS 부문명
      ,    A.GOOD_CLS2NM
      ,    A.GOODS_CD
      ,    A.GOODNM
+
+
