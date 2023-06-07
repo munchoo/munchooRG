@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Root xmlns="http://www.nexacro.com/platform/dataset" ver="5000">
-	<Parameters>
-		<Parameter id="ErrorCode" type="string">90001</Parameter>
-		<Parameter id="ErrorMsg" type="string">Invalid&#32;Session</Parameter>
-	</Parameters>
-</Root>

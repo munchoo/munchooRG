@@ -55,7 +55,3 @@ GROUP BY A.BIZPL_CD ,
        A.OPER_DT_CNT
  --ORDER BY BIZPL_CD, OPER_DT      
 ;   
-
-[분석엔진 계산 단계:
-	1.  cross-tabbing 수행
-]
