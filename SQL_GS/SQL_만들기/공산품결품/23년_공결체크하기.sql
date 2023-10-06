@@ -9,11 +9,11 @@ with OrderItem as (
     join LGMJVDP.TB_STORE_DM a13
         on  (a11.STORECD = a13.STORECD)
     where a11.DATECD in to_char(SYSDATE-1, 'YYYY-MM-DD')
-        and a13.TEAMCD in ('5401','5402','5403','5404','5405', '5406','5407','5409','5410')
+        and a13.TEAMCD in ('5401','5402','5403','5404','5405', '5406','5407','5408','5409','5410')
         and a11.GOODCD in (select
             distinct(GOODS_CD)
             from   LGMJVDP.TS_OP_OUTSTK_SKU
-            where OPER_DT between '20230701' and '20230731')
+            where OPER_DT in to_char(SYSDATE-1,'YYYYMMDD'))
     group by a11.STORECD, to_char(a11.DATECD,'YYYYMMDD'), a11.GOODCD
     having  sum(a11.ODR_QTY) > 0
 )
@@ -43,8 +43,8 @@ on trim(a11.ORIGIN_BIZPL_CD) = 'V'||a14.STORECD
 and a11.OPER_DT = a14.DATECD
 and a11.GOODS_CD = a14.GOODCD
 ----
-where a12.TEAMCD in ('5401','5402','5403','5404','5405', '5406','5407','5409','5410')
-and OPER_DT between '20230701' and '20230731'
+where a12.TEAMCD in ('5401','5402','5403','5404','5405', '5406','5407','5408','5409','5410')
+and OPER_DT like to_char(SYSDATE,'YYYYMM')||'%'
 
 
 
@@ -68,8 +68,7 @@ join (select
     where DATECD like (to_char(SYSDATE, 'YYYY-MM') || '%') and SALDT_CNT = 1 group by DATECD, STORECD) a13
 on trim(a11.ORIGIN_BIZPL_CD) = 'V'||a13.STORECD
 and a11.OPER_DT = to_char(a13.DATECD,'YYYYMMDD')
-where a12.TEAMCD in ('5401','5402','5403','5404','5405', '5406','5407','5409
-','5410') 
+where a12.TEAMCD in ('5401','5402','5403','5404','5405', '5406','5407''5408','5409','5410') 
 and OPER_DT like (to_char(SYSDATE, 'YYYYMM') || '%')
 group by
     a11.OPER_DT,
