@@ -193,3 +193,20 @@ GROUP by  TO_CHAR(A.DLIV_RQUST_ACQ_DTTM,'HH24')
 
 
 
+
+------------------231104 심플하게 조회하기 
+
+SELECT    
+          A.ORIGIN_BIZPL_CD AS 최초코드
+     ,    F.TEAM_LN AS 팀명
+     ,    C.BIZPL_NM AS 점포명
+     ,    CASE WHEN A.DLIV_RQUST_SP_CD in ('A') THEN '정상'
+          WHEN A.DLIV_RQUST_SP_CD in ('C') THEN '업체취소'
+          WHEN A.DLIV_RQUST_SP_CD in ('D') THEN '점포취소'
+          ELSE '기타' END AS 주문구분코드
+  FROM    GSSCODS.TS_TS_DLIV_RQUST A
+  JOIN    LGMJVDP.TS_MS_BIZPL C
+    ON    A.BIZPL_CD = C.BIZPL_CD
+  JOIN    LGMJVDP.TB_STORE_DM F
+    ON    SUBSTR(C.ORIGIN_BIZPL_CD,2,4) = F.STORECD
+   AND    F.RGNCD BETWEEN ('41') AND ('60')

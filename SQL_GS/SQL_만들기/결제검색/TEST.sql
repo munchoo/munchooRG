@@ -1,0 +1,29 @@
+select  A.RBT_EVENT_YEAR,
+        A.RBT_EVENT_CD,
+        A.GOODS_REGION_CD,
+        A.GOODS_CD,
+        A.BIZPL_CD,
+        A.ORD_DT,
+        A.ORD_QTY,
+        A.SUPP_QTY,
+        A.SUPP_AMT,
+        A.ADDT_SUPP_AMT,
+        A.EVENT_START_DT,
+        A.EVENT_END_DT,
+        A.ADDT_RBT_AMT,
+        A.PRVD_BASE_GOODS_CNT,
+        A.PRVD_BASE_QTY,
+        A.PRVD_RBT_AMT,
+        A.RBT_LIMT_AMT,
+        A.RBT_EVENT_GOODS_CNT,
+        A.INSERT_DTTM,
+        A.PRVD_BASE_COND_SP,
+        B.EVENT_NM
+from   LGMJVDP.TH_EV_RBT_EVENT_ACHV A,  
+  LGMJVDP.TH_EV_RBT_EVENT B
+where 1=1 
+    AND A.RBT_EVENT_YEAR = B.RBT_EVENT_YEAR
+    AND A.RBT_EVENT_CD = B.RBT_EVENT_CD
+    AND A.GOODS_REGION_CD = B.GOODS_REGION_CD
+    AND A.EVENT_END_DT like ('2023-09'||'%') 
+    AND A.BIZPL_CD in ('VDJ92')

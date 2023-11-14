@@ -1,109 +1,91 @@
-SELECT *
-FROM LGMJVDP.TH_TR_SMPL_PAY_TENDER
-WHERE OPER_DT ='20210912'
- AND  SMPL_PAY_SVC_CD IN ('08','09') -- GS PAY 08 : 신용카드, 09 : 계좌
-LIMIT 10;
+SELECT    영업일자
+     ,    부문명
+     ,    팀명
+     ,    OFC명
+     ,    최초점포코드
+     ,    점포코드
+     ,    점포명
+     ,    SUM(TOT_DEAL_COUNT) AS 전체결제건수
+     ,    SUM(TOT_DEAL_AMT)  AS 전체결제금액
+     ,    SUM(GSPAY_CARD_COUNT) AS GSPAY카드결제건수
+     ,    SUM(GSPAY_ACCOUNT_COUNT) AS GSPAY계좌결제건수
+     ,    SUM(GSPAY_CARD_AMT) AS GSPAY카드결제금액
+     ,    SUM(GSPAY_ACCOUNT_AMT) AS GSPAY계좌결제금액
+  FROM    (
 
---------------------------------------------------
-WITH ITEM AS (
-SELECT    A.OPER_DT
+SELECT    OPER_DT AS 영업일자
+     ,    C.RGNNM AS 부문명
+     ,    C.TEAM_LN  AS 팀명
+     ,    C.PART_LN AS OFC명
+     ,    A.ORIGIN_BIZPL_CD AS 최초점포코드
+     ,    A.BIZPL_CD AS 점포코드 
+     ,    B.BIZPL_NM AS 점포명
+     ,    SUM(CASE WHEN TOT_AMT > 0 THEN 1 
+                   WHEN TOT_AMT < 0 THEN -1  END) AS TOT_DEAL_COUNT
+     ,    SUM(TOT_AMT) AS TOT_DEAL_AMT
+     ,    0 AS GSPAY_CARD_COUNT
+     ,    0 AS GSPAY_ACCOUNT_COUNT
+     ,    0 AS GSPAY_CARD_AMT
+     ,    0 AS GSPAY_ACCOUNT_AMT
+  FROM    GSSCODS.TS_TR_HEADER A
+  JOIN    LGMJVDP.TS_MS_BIZPL B
+    ON    A.BIZPL_CD = B.BIZPL_CD
+  JOIN    LGMJVDP.TB_STORE_DM C
+    ON    SUBSTR(A.ORIGIN_BIZPL_CD,2,4) = C.STORECD
+ WHERE 11=11
+   AND  C.TEAMCD IN ('5405')   
+  AND    A.OPER_DT BETWEEN REPLACE('2023-11-01','-','')   AND REPLACE('2023-11-02','-','')
+  AND    DEAL_SP = '01'
+   AND    TOT_AMT <> 0
+ GROUP BY OPER_DT
+     ,    C.RGNNM
+     ,    C.TEAM_LN
+     ,    C.PART_LN
      ,    A.ORIGIN_BIZPL_CD
-     ,    A.POS_NO
-     ,    A.SALE_SEQ
-     ,    SUM(CASE WHEN SALE_SP <> '3' AND A.GOODS_CD <> ''  THEN (DC_PRC * SALE_QTY) - MBR_DC_AMT - PRMT_dC_AMT ELSE 0 END) AS SALE_AMT
-  FROM    GSSCODS.TS_TR_ITEM A
- WHERE    (OPER_DT BETWEEN  '20220601' AND '20220630' OR OPER_DT BETWEEN  '20220711' AND '20220731')
-   AND    SKU_CANCEL_YN ='N'
-   --AND    A.ORIGIN_BIZPL_CD = 'V1008'  
-   AND    SALE_SP IN ('1','2','3')
- GROUP BY A.OPER_DT
-     ,    A.ORIGIN_BIZPL_CD
-     ,    A.POS_NO
-     ,    A.SALE_SEQ
-),
-SMPL AS(
-SELECT    A.OPER_DT
-     ,    A.ORIGIN_BIZPL_CD
-     ,    A.POS_NO
-     ,    A.SALE_SEQ
-     ,    A.NOR_CANCEL_SP
-     ,    A.SMPL_PAY_SVC_CD
-     ,    B.RGNNM
-     ,    B.TEAM_LN
-     ,    B.PART_LN
-     ,    C.OPEN_DT
-     ,    C.CLOSE_DT
-     ,    C.BIZPL_NM
-     ,    C.BIZPL_cD
+     ,    A.BIZPL_CD
+     ,    B.BIZPL_NM
+ 
+ 
+ UNION ALL
+ 
+SELECT    A.OPER_DT AS 영업일자
+     ,    C.RGNNM AS 부문명
+     ,    C.TEAM_LN  AS 팀명
+     ,    C.PART_LN AS OFC명
+     ,    A.ORIGIN_BIZPL_CD AS 최초점포코드
+     ,    A.BIZPL_CD AS 점포코드 
+     ,    B.BIZPL_NM AS 점포명
+     ,    0 AS TOT_DEAL_COUNT
+     ,    0 AS TOT_DEAL_AMT
+     ,    SUM(CASE WHEN SMPL_PAY_SVC_CD = '08' AND NOR_CANCEL_SP = '0' THEN 1 
+                   WHEN SMPL_PAY_SVC_CD = '08' AND NOR_CANCEL_SP = '9' THEN -1 
+              END) AS GSPAY_CARD_COUNT
+     ,    SUM(CASE WHEN SMPL_PAY_SVC_CD = '09' AND NOR_CANCEL_SP = '0' THEN 1 
+                   WHEN SMPL_PAY_SVC_CD = '09' AND NOR_CANCEL_SP = '9' THEN -1 
+              END) AS GSPAY_ACCOUNT_COUNT
+     ,    SUM(CASE WHEN SMPL_PAY_SVC_CD = '08' THEN SMPL_PAY_DEAL_AMT END) AS GSPAY_CARD_AMT
+     ,    SUM(CASE WHEN SMPL_PAY_SVC_CD = '09' THEN SMPL_PAY_DEAL_AMT END) AS GSPAY_ACCOUNT_AMT
   FROM    GSSCODS.TS_TR_SMPL_PAY_TENDER A
-  JOIN    LGMJVDP.TB_STORE_DM B
-    ON    SUBSTR(A.ORIGIN_BIZPL_CD,2,4) = B.STORECD
-  JOIN    LGMJVDP.TS_MS_BIZPL C
-    ON    A.BIZPL_CD = C.BIZPL_CD
- WHERE    (OPER_DT BETWEEN  '20220601' AND '20220630' OR OPER_DT BETWEEN  '20220711' AND '20220731')
-   --AND    A.ORIGIN_BIZPL_CD = 'V1008'
-   AND    SMPL_PAY_SVC_CD IN ('08', '09')
-   AND    B.RGNCD IN ('52','53','54')
+  JOIN    LGMJVDP.TS_MS_BIZPL B
+    ON    A.BIZPL_CD = B.BIZPL_CD
+  JOIN    LGMJVDP.TB_STORE_DM C
+    ON    SUBSTR(A.ORIGIN_BIZPL_CD,2,4) = C.STORECD
+ WHERE  11=11
+   AND  C.TEAMCD IN ('5405')
+    AND    A.OPER_DT  BETWEEN REPLACE('2023-11-01','-','')   AND REPLACE('2023-11-02','-','')
+    AND    SMPL_PAY_SVC_CD IN ('08','09')
  GROUP BY A.OPER_DT
-     ,    A.ORIGIN_BIZPL_CD
-     ,    A.POS_NO
-     ,    A.SALE_SEQ
-     ,    A.NOR_CANCEL_SP
-     ,    A.SMPL_PAY_SVC_CD
-     ,    B.RGNNM
-     ,    C.OPEN_DT
-     ,    C.CLOSE_DT
-     ,    B.TEAM_LN
-     ,    B.PART_LN
-     ,    C.BIZPL_NM
-     ,    C.BIZPL_cD
-), Opedt as(
-    select 'V'||a11.STORECD  STORECD, 
-    sum(case when month(a11.datecd) = 6 then a11.SALDT_CNT END)   as mon6,
-    sum(case when month(a11.datecd) = 7 then a11.SALDT_CNT END)   as mon7
-    from  LGMJVDP.TB_SALDT_FT a11
-    join LGMJVDP.TB_STORE_DM a12
-      on  (a11.STORECD = a12.STORECD)
-    where (a11.DATECD between ('2022-06-01') and ('2022-06-30') or a11.DATECD between ('2022-07-11') and ('2022-07-31'))
-    group by 'V'||a11.STORECD
-)
-SELECT    A.RGNNM
-     ,    A.TEAM_LN
-     ,    A.PART_LN
-     ,    A.ORIGIN_BIZPL_CD
-     ,    A.BIZPL_CD
-     ,    A.BIZPL_NM
-     ,    A.OPEN_DT
-     ,    A.CLOSE_DT
-    -- ,    SUM(CASE WHEN A.SMPL_PAY_SVC_CD = '08' THEN B.SALE_AMT END) AS GSPAY신용카드매출
-    -- ,    SUM(CASE WHEN A.SMPL_PAY_SVC_CD = '09' THEN B.SALE_AMT END) AS GSPAY계좌매출
-     ,    SUM(CASE WHEN A.SMPL_PAY_SVC_CD = '08' AND A.NOR_CANCEL_SP ='0' AND A.OPER_DT < '20220701' THEN 1 
-                   WHEN A.SMPL_PAY_SVC_CD = '08' AND A.NOR_CANCEL_SP ='9' AND A.OPER_DT < '20220701' THEN -1 END) AS GSPAY신용카드건수6
-     ,    SUM(CASE WHEN A.SMPL_PAY_SVC_CD = '09' AND A.NOR_CANCEL_SP ='0' AND A.OPER_DT < '20220701' THEN 1 
-                   WHEN A.SMPL_PAY_SVC_CD = '09' AND A.NOR_CANCEL_SP ='9' AND A.OPER_DT < '20220701' THEN -1 END) AS GSPAY계좌건수6
-     ,    SUM(CASE WHEN A.SMPL_PAY_SVC_CD = '08' AND A.NOR_CANCEL_SP ='0' AND A.OPER_DT >= '20220701' THEN 1 
-                   WHEN A.SMPL_PAY_SVC_CD = '08' AND A.NOR_CANCEL_SP ='9' AND A.OPER_DT >= '20220701' THEN -1 END) AS GSPAY신용카드건수7
-     ,    SUM(CASE WHEN A.SMPL_PAY_SVC_CD = '09' AND A.NOR_CANCEL_SP ='0' AND A.OPER_DT >= '20220701' THEN 1 
-                   WHEN A.SMPL_PAY_SVC_CD = '09' AND A.NOR_CANCEL_SP ='9' AND A.OPER_DT >= '20220701' THEN -1 END) AS GSPAY계좌건수7
-     ,    C.mon6
-     ,    c.mon7     
-  FROM    ITEM B
-  JOIN    SMPL A 
-    ON    A.OPER_DT = B.OPER_DT
-   AND    A.ORIGIN_BIZPL_CD = B.ORIGIN_BIZPL_CD
-   AND    A.POS_NO = B.POS_NO
-   AND    A.SALE_sEQ = B.SALE_SEQ
-   AND    A.CLOSE_DT = ''
-  JOIN    Opedt C
-    ON    A.ORIGIN_BIZPL_CD = C.STORECD
- GROUP BY A.RGNNM
-     ,    A.TEAM_LN
-     ,    A.PART_LN
-     ,    A.ORIGIN_BIZPL_CD
-     ,    A.BIZPL_CD
-     ,    A.BIZPL_NM
-     ,    A.OPEN_DT
-     ,    A.CLOSE_DT
-     ,    mon6
-     ,    mon7
- ORDER BY 1,2,3,4,5,6,7,8
+     ,    C.RGNNM 
+     ,    C.TEAM_LN  
+     ,    C.PART_LN 
+     ,    A.ORIGIN_BIZPL_CD 
+     ,    A.BIZPL_CD 
+     ,    B.BIZPL_NM 
+ )   
+ GROUP BY 영업일자
+     ,    부문명
+     ,    팀명
+     ,    OFC명
+     ,    최초점포코드
+     ,    점포코드
+     ,    점포명
