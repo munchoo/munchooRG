@@ -18,6 +18,7 @@ appkey = 'JnGuxK4RYSLPlXaP1gCXAa3fKiku312v6SUGElID'
 # ----------------------------------------------
 api_url = 'https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query='
 
+
 root = tkinter.Tk()
 root.withdraw()
 tkinter.messagebox.showinfo(title='정보', message='불러올 엑셀파일을 선택해주세요.\n컬럼구조는\n|점포코드|구주소|도로명주소|')
@@ -34,7 +35,7 @@ print(data.head(10))
 # api이용 좌표 찾기
 
 geo_coordi = []
-  
+
 for add  in data['도로명주소']:
     add_urlenc = parse.quote(add)
     url = api_url + add_urlenc
