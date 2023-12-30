@@ -5,6 +5,7 @@ from io import BytesIO
 import openpyxl
 import os
 import webbrowser
+from datetime import datetime
 
 # 세션 생성
 session = requests.Session()
@@ -14,6 +15,7 @@ session = requests.Session()
 baseurl = 'http://cvsscn.gsretail.com/cssc/portal/portal/Login.do'
 url = 'http://cvsscn.gsretail.com/FileView.dwn'
 fileSearch_url ='http://cvsscn.gsretail.com/cssc/common/RetrieveGoodList.do'
+imgAddress_url ='http://cvsscn.gsretail.com/cssc/mst/goods/RetrieveGoodsMstDetail.do'
 
 # 헤더 설정
 headers = headers = {
@@ -36,14 +38,19 @@ headers = headers = {
 }
 
 
+
+
 payload_base = 'SSV:utf-8WMONID=zGMRj_qMn58Dataset:ds_login_RowType_USER_ID:STRING(256)PASSWD:STRING(256)URL:STRING(256)IP_INFO:STRING(256)SMS_AUTH:STRING(256)CONN_SYS_SP:STRING(256)CONN_SHPE_SP_CD:STRING(256)CONN_SUCC_YN:STRING(256)CONN_ERR_MSG_CD:STRING(256)CONN_CNF_SP_CD:STRING(256)LOG_CRT_YN:STRING(256)CONN_ERR_MSG_DTL:STRING(256)CONN_RESTR_FUNC_USE_YN:STRING(256)N2910508616017B30911E454F92F08296E224AC3D612CF45704372CISICY'
 # 로그인 데이터 설정
 payload_search = 'SSV:utf-8WMONID=s1YTl2HPVGlCUR_PGM_ID=SMSGO02_GoodsMstDetailMDataset:ds_inInqCondSearch_RowType_ORIGIN_BIZPL_CD:STRING(256)GOODS_REGION_CD:STRING(256)CLASS_CD:STRING(256)GOODS_CD:STRING(256)GOODS_NM:STRING(256)BIZPL_CD:STRING(256)N88002798빙그레)바나나우유240ML'
+payload_imgAddress = 'SSV:utf-8_ga=GA1.1.99319122.1689267668_ga_CHSRECZ6BZ=GS1.1.1689292043.2.0.1689292043.60.0.0WMONID=G1xb13q0zVNCUR_PGM_ID=SMSGO02_GoodsMstDetailMDataset:ds_inGoodsmstdtlRetrieveGoodsMstDetailBR_RowType_GOODS_CD:STRING(256)GOODS_REGION_CD:STRING(256)ORIGIN_BIZPL_CD:STRING(256)BIZPL_CD:STRING(256)ORD_SP:STRING(256)BIZPL_DSTRB_DT:STRING(256)RTN_DT:STRING(256)N2700038852555220231208'
 
 payload_search = payload_search.encode('utf-8')
+payload_imgAddress = payload_imgAddress.encode('utf-8')
 
 base_response = session.post(baseurl, data=payload_base, headers=headers)
 respon_cookie = base_response.headers.get('Set-Cookie')
+
 if respon_cookie :
     headers['Cookie'] = respon_cookie
     print(respon_cookie)
@@ -55,6 +62,11 @@ if base_response.status_code == 200:
 else:
     print('no')
 
+imgAddress_response = session.post(imgAddress_url, data=payload_imgAddress, headers=headers)
+print(imgAddress_response.text)
+
+
+
 
 
 # 파일이름들
@@ -64,9 +76,15 @@ fileNms = []
 wb = openpyxl.load_workbook('your_excel_file.xlsx')  # 엑셀 파일 경로 및 이름 수정
 sheet = wb.active
 
+# 엑셀파일 상품코드를 스토리지의 파일명으로 변환하기
+
 # 엑셀 파일 순회하며 이미지 파일 다운로드
 for row in sheet.iter_rows(min_row=2, values_only=True):  # 첫 번째 행은 헤더이므로 무시
     file_name = row[0]  # 파일명은 첫 번째 열에 위치
+    ##########
+    imgAddress_response = session.post(imgAddress_url, data=payload_imgAddress, headers=headers)
+
+
     fileNms = file_name
     # 파일 다운로드 요청
     print(file_name)
@@ -78,7 +96,7 @@ for row in sheet.iter_rows(min_row=2, values_only=True):  # 첫 번째 행은 �
         file_data = response.content
         try:
             imagee =  Image.open(BytesIO(file_data))
-            imagee.show()
+            #imagee.show()
             print(imagee)
 
         except Exception as e:
