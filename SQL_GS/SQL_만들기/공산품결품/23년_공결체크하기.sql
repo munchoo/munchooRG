@@ -33,7 +33,7 @@ select a11.OPER_DT,
     a11.TARGET_GOODS_CNT,
     a11.OUTSTK_YN,
     a11.BIZPL_CD
-from   LGMJVDP.TS_OP_OUTSTK_SKU a11 
+from   LGMJVDP.TS_OP_OUTSTK_SKU a11 TS_OP_OUTSTK
 join LGMJVDP.TB_STORE_DM a12 
 on trim(a11.ORIGIN_BIZPL_CD) = 'V'||a12.STORECD  
 left join LGMJVDP.TB_GOOD_DM a13
@@ -45,9 +45,9 @@ and a11.OPER_DT = a14.DATECD
 and a11.GOODS_CD = a14.GOODCD
 ----
 where a12.TEAMCD in ('5601','5602','5603','5604', '5605','5606','5607','5608') 
-and OPER_DT like to_char(SYSDATE,'YYYYMM')||'%'
+and OPER_DT like to_char(SYSDATE,'YYYYMM')||'%' 
 
-
+  
 
 
 ------- 집계데이터 결품률 찾기 
@@ -63,10 +63,10 @@ right join LGMJVDP.TB_STORE_DM a12
 on trim(a11.ORIGIN_BIZPL_CD) = 'V'||a12.STORECD   
 join (select
         DATECD,
-        sum(SALDT_CNT) AS SAL_DT,
+        SALDT_CNT AS SAL_DT,
         STORECD
     from LGMJVDP.TB_SALDT_FT
-    where DATECD like (to_char(SYSDATE, 'YYYY-MM') || '%') and SALDT_CNT = 1 group by DATECD, STORECD) a13
+    where DATECD like (to_char(SYSDATE, 'YYYY-MM') || '%') and SALDT_CNT = 1 ) a13
 on trim(a11.ORIGIN_BIZPL_CD) = 'V'||a13.STORECD
 and a11.OPER_DT = to_char(a13.DATECD,'YYYYMMDD')
 where a12.TEAMCD in ('5601','5602','5603','5604', '5605','5606','5607','5608') 

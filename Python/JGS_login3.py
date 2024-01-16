@@ -10,8 +10,10 @@ import hashlib
 BASE_URL = 'http://cvsscn.gsretail.com'
 LOGIN_URL = f'{BASE_URL}/cssc/portal/portal/Login.do'
 FILE_SEARCH_URL1 = f'{BASE_URL}/cssc/ord/hqord/RetrieveSkuPerOrdOganList.do'
-IMG_ADDRESS_URL = f'{BASE_URL}/cssc/mst/goods/RetrieveGoodsMstDetail.do'
+# FILE_SEARCH_URL1 = f'{BASE_URL}/cssc/mst/bizpl/RetrieveSysOrdLine.do'
+IMG_ADDRESS_URL1 = f'{BASE_URL}/cssc/ord/gnrlord/RetrieveOrdGoodsMng.do'
 FILE_DOWNLOAD_URL = f'{BASE_URL}/FileView.dwn'
+
 
 HEADERS = {
     'Accept': 'application/xml, text/xml, */*',
@@ -19,7 +21,7 @@ HEADERS = {
     'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
     'Cache-Control': 'no-cache, no-store',
     'Connection': 'keep-alive',
-    'Content-Length': '603',
+    'Content-Length': '612',
     'Content-Type': 'text/xml',
     'Expires': '-1',
     'Host': 'cvsscn.gsretail.com',
@@ -37,7 +39,6 @@ def update_headers(headers, additional_headers):
     return updated_headers
 
 def login(session):
-    # payload = 'SSV:utf-8WMONID=zGMRj_qMn58Dataset:ds_login_RowType_USER_ID:STRING(256)PASSWD:STRING(256)URL:STRING(256)IP_INFO:STRING(256)SMS_AUTH:STRING(256)CONN_SYS_SP:STRING(256)CONN_SHPE_SP_CD:STRING(256)CONN_SUCC_YN:STRING(256)CONN_ERR_MSG_CD:STRING(256)CONN_CNF_SP_CD:STRING(256)LOG_CRT_YN:STRING(256)CONN_ERR_MSG_DTL:STRING(256)CONN_RESTR_FUNC_USE_YN:STRING(256)N2910508616017B30911E454F92F08296E224AC3D612CF45704372CISICY'
     payload = f'SSV:utf-8WMONID=zGMRj_qMn58Dataset:ds_login_RowType_USER_ID:STRING(256)PASSWD:STRING(256)URL:STRING(256)IP_INFO:STRING(256)SMS_AUTH:STRING(256)CONN_SYS_SP:STRING(256)CONN_SHPE_SP_CD:STRING(256)CONN_SUCC_YN:STRING(256)CONN_ERR_MSG_CD:STRING(256)CONN_CNF_SP_CD:STRING(256)LOG_CRT_YN:STRING(256)CONN_ERR_MSG_DTL:STRING(256)CONN_RESTR_FUNC_USE_YN:STRING(256)N{lgid}{lgpw.upper()}CISICY'
     payload = payload.encode('utf-8')
     response = session.post(LOGIN_URL, data=payload, headers=HEADERS)
@@ -64,23 +65,46 @@ def search_files(session, cookie):
         print("JSESSIONID 찾을 수 없습니다.")        
 
     # headers = HEADERS.copy()
-    new_header = update_headers(HEADERS,{'Cookie':f'_ga=GA1.1.99319122.1689267668; _ga_CHSRECZ6BZ=GS1.1.1689292043.2.0.1689292043.60.0.0; WMONID={wmonid}; _ga=GA1.1.99319122.1689267668; _ga_CHSRECZ6BZ=GS1.1.1689292043.2.0.1689292043.60.0.0; JSESSIONID={JSESSIONID}'})
-    
-
-    # if cookie :
-    #     headers['Cookie'] = f'_ga=GA1.1.99319122.1689267668; _ga_CHSRECZ6BZ=GS1.1.1689292043.2.0.1689292043.60.0.0; WMONID={wmonid}; _ga=GA1.1.99319122.1689267668; _ga_CHSRECZ6BZ=GS1.1.1689292043.2.0.1689292043.60.0.0; JSESSIONID={JSESSIONID}'
-    #     headers['Expires'] = '-1'
-    #     # print(cookie)
-
-    payload1 = f'SSV:utf-8_ga=GA1.1.99319122.1689267668_ga_CHSRECZ6BZ=GS1.1.1689292043.2.0.1689292043.60.0.0WMONID=j3VXlTEnzv4CUR_PGM_ID=SORHQ03_SkuPerOrdOganMDataset:ds_inInqCond_RowType_ORGAN_SP:STRING(256)ORGAN_CD:STRING(256)ORD_DT:STRING(256)GOODS_CD1:STRING(256)GOODS_CD2:STRING(256)GOODS_CD3:STRING(256)GOODS_CD4:STRING(256)GOODS_CD5:STRING(256)GOODS_CD6:STRING(256)GOODS_CD7:STRING(256)GOODS_CD8:STRING(256)GOODS_CD9:STRING(256)GOODS_CD10:STRING(256)USER_ID:STRING(256)USE_SP:STRING(256)PGM_ID:STRING(256)Nteam5600320231228{PLUdata}2910508616017QSORHQ03_SkuPerOrdOganM'
-
+    new_header = update_headers(HEADERS,{'Cookie':f'_ga=GA1.1.99319122.1689267668; _ga_CHSRECZ6BZ=GS1.1.1689292043.2.0.1689292043.60.0.0; WMONID={wmonid}; _ga=GA1.1.99319122.1689267668; _ga_CHSRECZ6BZ=GS1.1.1689292043.2.0.1689292043.60.0.0; JSESSIONID={JSESSIONID}','Expires':'-1'})
+    payload1 = f'SSV:utf-8_ga=GA1.1.99319122.1689267668_ga_CHSRECZ6BZ=GS1.1.1689292043.2.0.1689292043.60.0.0WMONID=j3VXlTEnzv4CUR_PGM_ID=SORHQ03_SkuPerOrdOganMDataset:ds_inInqCond_RowType_ORGAN_SP:STRING(256)ORGAN_CD:STRING(256)ORD_DT:STRING(256)GOODS_CD1:STRING(256)GOODS_CD2:STRING(256)GOODS_CD3:STRING(256)GOODS_CD4:STRING(256)GOODS_CD5:STRING(256)GOODS_CD6:STRING(256)GOODS_CD7:STRING(256)GOODS_CD8:STRING(256)GOODS_CD9:STRING(256)GOODS_CD10:STRING(256)USER_ID:STRING(256)USE_SP:STRING(256)PGM_ID:STRING(256)Nteam5600320240109{PLUdata}2910508616017QSORHQ03_SkuPerOrdOganM'
     payload1 = payload1.encode('utf-8')
+    # payload1 = f'SSV:utf-8_ga=GA1.1.99319122.1689267668_ga_CHSRECZ6BZ=GS1.1.1689292043.2.0.1689292043.60.0.0WMONID={wmonid}CUR_PGM_ID=SORGN01_SysOrdObjLineMngNewMDataset:ds_inBizpl_RowType_ORIGIN_BIZPL_CD:STRING(256)NV3D63'
+    # payload1 = payload1.encode('utf-8')
 
     # print(payload1)
 
     response1 = session.post(FILE_SEARCH_URL1, data=payload1, headers=new_header)
 
     # print(response1.text)
+
+    if response1.status_code == 200:
+        return response1.text
+    else:
+        print(f'파일 검색 실패: {response1.status_code}')
+        return None
+
+def search_address(session, cookie):
+    match = re.search(r'WMONID=([^;]+)', cookie)
+    match2 = re.search(r'JSESSIONID=([^;]+)', cookie)
+    if match:
+        wmonid = match.group(1)
+        # print(wmonid)
+    else:
+        print("WMONID를 찾을 수 없습니다.")
+    if match2:
+        JSESSIONID = match2.group(1)
+        # print(JSESSIONID)
+    else:
+        print("JSESSIONID 찾을 수 없습니다.")        
+
+    new_header = update_headers(HEADERS,{'Cookie':f'_ga=GA1.1.99319122.1689267668; _ga_CHSRECZ6BZ=GS1.1.1689292043.2.0.1689292043.60.0.0; WMONID={wmonid}; _ga=GA1.1.99319122.1689267668; _ga_CHSRECZ6BZ=GS1.1.1689292043.2.0.1689292043.60.0.0; JSESSIONID={JSESSIONID}','Expires':'-1'})
+    payload1 = f'SSV:utf-8_ga=GA1.1.99319122.1689267668_ga_CHSRECZ6BZ=GS1.1.1689292043.2.0.1689292043.60.0.0WMONID={wmonid}CUR_PGM_ID=SORGN04_LedgerOrdMDataset:ds_inOrdGood_RowType_GOODS_REGION_CD:STRING(256)ORIGIN_BIZPL_CD:STRING(256)BIZPL_CD:STRING(256)ORD_DT:STRING(256)GOODS_CD:STRING(256)NVU135VU135202401168809641770868'
+    payload1 = payload1.encode('utf-8')
+    print(payload1)
+    response1 = session.post(IMG_ADDRESS_URL1, data=payload1, headers=new_header)
+    aa = response1.text
+    aa = aa.encode('ascii')
+    print(aa)
 
     if response1.status_code == 200:
         return response1.text
@@ -135,7 +159,7 @@ def main_imgdown():
 
     if cookie:
         # 파일 검색
-        file_search_result = search_files(session, cookie)
+        file_search_result = search_address(session, cookie)
         # print(file_search_result)
 
         if file_search_result:
@@ -152,14 +176,9 @@ def main_imgdown():
             wb.close()
 
 def main_stkcheck():
-    session = requests.Session()
-
-    # 로그인
-    cookie = login(session)
-
     if cookie:
         file_search_result = search_files(session, cookie)
-        # print(file_search_result)
+        print(file_search_result)
     return file_search_result
 
 
@@ -176,6 +195,10 @@ if __name__ == "__main__":
     if select == '1':
         main_imgdown()
     elif select == '2':
+        session = requests.Session()
+        # 로그인
+        cookie = login(session)
+
         excel_file_path = 'input_excel.xlsx'  # 실제 파일 경로로 변경해야 합니다.
         df = pd.read_excel(excel_file_path)
     
@@ -225,6 +248,6 @@ if __name__ == "__main__":
         result_frame = pd.concat(data_frame, axis= 1)
         result_frame = pd.melt(result_frame,id_vars=['점포명','현재코드'],var_name='구분',value_name='값')
         result_frame[['구분', '상품코드']] = result_frame['구분'].str.split('_', expand=True)
-        result_frame = result_frame.query('구분 == "재고"')
+        result_frame = result_frame.query('구분 == "발주"')
         result_frame.to_excel("출력파일.xlsx", index=False)
 
