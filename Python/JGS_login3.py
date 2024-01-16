@@ -102,7 +102,7 @@ def search_Imgaddress(session, cookie, GOOODCDidx):
     payload1 = f'SSV:utf-8_ga=GA1.1.153126700.1689945979_ga_CHSRECZ6BZ=GS1.1.1697849921.2.1.1697850054.60.0.0WMONID={wmonid}CUR_PGM_ID=SMSGO02_NewGoodsMstDetailMDataset:ds_inGoodsmstdtlRetrieveGoodsMstDetailBR_RowType_GOODS_CD:STRING(256)GOODS_REGION_CD:STRING(256)ORIGIN_BIZPL_CD:STRING(256)BIZPL_CD:STRING(256)ORD_SP:STRING(256)BIZPL_DSTRB_DT:STRING(256)RTN_DT:STRING(256)N{GOOODCDidx[0]}11VO046VO04622024011720240117'
 
     response1 = session.post(IMG_ADDRESS_URL1, data=payload1, headers=new_header)
-    print(response1.text)
+    # print(response1.text)
 
     # jpg주소를 정규표현식방식으로 추출
     if response1.status_code == 200:
