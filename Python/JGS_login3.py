@@ -29,19 +29,20 @@ HEADERS = {
     'Origin': 'http://cvsscn.gsretail.com',
     'Pragma': 'no-cache',
     'Referer': 'http://cvsscn.gsretail.com/cssc/index.html',
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
     'X-Requested-With': 'XMLHttpRequest'
 }
 
-def update_headers(headers, additional_headers):
+def update_headers(headers, cookie):
     updated_headers = headers.copy()
-    updated_headers.update(additional_headers)
     return updated_headers
 
 def login(session):
     payload = f'SSV:utf-8WMONID=zGMRj_qMn58Dataset:ds_login_RowType_USER_ID:STRING(256)PASSWD:STRING(256)URL:STRING(256)IP_INFO:STRING(256)SMS_AUTH:STRING(256)CONN_SYS_SP:STRING(256)CONN_SHPE_SP_CD:STRING(256)CONN_SUCC_YN:STRING(256)CONN_ERR_MSG_CD:STRING(256)CONN_CNF_SP_CD:STRING(256)LOG_CRT_YN:STRING(256)CONN_ERR_MSG_DTL:STRING(256)CONN_RESTR_FUNC_USE_YN:STRING(256)N{lgid}{lgpw.upper()}CISICY'
     payload = payload.encode('utf-8')
     response = session.post(LOGIN_URL, data=payload, headers=HEADERS)
+    print(response.cookies.get('JSESSIONID'))
+    print(response.cookies.get('WMONID'))
     if response.status_code == 200:
         print('로그인 성공')
         # print(response.headers.get('Set-Cookie'))
@@ -50,6 +51,8 @@ def login(session):
         print(f'로그인 실패: {response.status_code}')
         return None
 
+
+# 단품발주 데이터 조회하기
 def search_files(session, cookie):
     match = re.search(r'WMONID=([^;]+)', cookie)
     match2 = re.search(r'JSESSIONID=([^;]+)', cookie)
@@ -65,8 +68,8 @@ def search_files(session, cookie):
         print("JSESSIONID 찾을 수 없습니다.")        
 
     # headers = HEADERS.copy()
-    new_header = update_headers(HEADERS,{'Cookie':f'_ga=GA1.1.153126700.1689945979; _ga_CHSRECZ6BZ=GS1.1.1697849921.2.1.1697850054.60.0.0; WMONID={wmonid}; _ga=GA1.1.153126700.1689945979; _ga_CHSRECZ6BZ=GS1.1.1697849921.2.1.1697850054.60.0.0; JSESSIONID={JSESSIONID}:1avt0fa4q','Expires':'-1'})
-    payload1 = f'SSV:utf-8_ga=GA1.1.99319122.1689267668_ga_CHSRECZ6BZ=GS1.1.1689292043.2.0.1689292043.60.0.0WMONID=j3VXlTEnzv4CUR_PGM_ID=SORHQ03_SkuPerOrdOganMDataset:ds_inInqCond_RowType_ORGAN_SP:STRING(256)ORGAN_CD:STRING(256)ORD_DT:STRING(256)GOODS_CD1:STRING(256)GOODS_CD2:STRING(256)GOODS_CD3:STRING(256)GOODS_CD4:STRING(256)GOODS_CD5:STRING(256)GOODS_CD6:STRING(256)GOODS_CD7:STRING(256)GOODS_CD8:STRING(256)GOODS_CD9:STRING(256)GOODS_CD10:STRING(256)USER_ID:STRING(256)USE_SP:STRING(256)PGM_ID:STRING(256)Nteam5600320240109{PLUdata}2910508616017QSORHQ03_SkuPerOrdOganM'
+    new_header = update_headers(HEADERS,{'Cookie':'_ga=GA1.1.99319122.1689267668; _ga_CHSRECZ6BZ=GS1.1.1689292043.2.0.1689292043.60.0.0; WMONID=mgji5Mw8cjM; _ga=GA1.1.99319122.1689267668; _ga_CHSRECZ6BZ=GS1.1.1689292043.2.0.1689292043.60.0.0; JSESSIONID=0001U-xIe4V7SZlfVaKIGI2EsOK:1avt0f73u','Expires':'-1'})
+    payload1 = f'SSV:utf-8_ga=GA1.1.99319122.1689267668_ga_CHSRECZ6BZ=GS1.1.1689292043.2.0.1689292043.60.0.0WMONID=j3VXlTEnzv4CUR_PGM_ID=SORHQ03_SkuPerOrdOganMDataset:ds_inInqCond_RowType_ORGAN_SP:STRING(256)ORGAN_CD:STRING(256)ORD_DT:STRING(256)GOODS_CD1:STRING(256)GOODS_CD2:STRING(256)GOODS_CD3:STRING(256)GOODS_CD4:STRING(256)GOODS_CD5:STRING(256)GOODS_CD6:STRING(256)GOODS_CD7:STRING(256)GOODS_CD8:STRING(256)GOODS_CD9:STRING(256)GOODS_CD10:STRING(256)USER_ID:STRING(256)USE_SP:STRING(256)PGM_ID:STRING(256)Nteam56003{find_date}{PLUdata}2910508616017QSORHQ03_SkuPerOrdOganM'
     payload1 = payload1.encode('utf-8')
     # payload1 = f'SSV:utf-8_ga=GA1.1.99319122.1689267668_ga_CHSRECZ6BZ=GS1.1.1689292043.2.0.1689292043.60.0.0WMONID={wmonid}CUR_PGM_ID=SORGN01_SysOrdObjLineMngNewMDataset:ds_inBizpl_RowType_ORIGIN_BIZPL_CD:STRING(256)NV3D63'
     # payload1 = payload1.encode('utf-8')
@@ -83,26 +86,19 @@ def search_files(session, cookie):
         print(f'파일 검색 실패: {response1.status_code}')
         return None
 
-def search_Imgaddress(session, cookie, GOOODCDidx):
-    match = re.search(r'WMONID=([^;]+)', cookie)
-    match2 = re.search(r'JSESSIONID=([^;]+)', cookie)
-    match3 = re.search(r'Expires=([^;]+)', cookie)
-    if match:
-        wmonid = match.group(1)
-    else:
-        print("WMONID를 찾을 수 없습니다.")
-    if match2:
-        SessionId = match2.group(1)
-    else:
-        print("JSESSIONID 찾을 수 없습니다.")
-    if match3:
-        ExpiresVar = match3.group(1)
+# 이미지 추출하기
+def search_Imgaddress(session, GOOODCDidx):
+    wmonid = session.cookies.get_dict().get('WMONID')
+    SessionId = session.cookies.get('JSESSIONID')
+    print(wmonid,'',SessionId)
 
-    new_header = update_headers(HEADERS,{'Cookie':'_ga=GA1.1.153126700.1689945979; _ga_CHSRECZ6BZ=GS1.1.1697849921.2.1.1697850054.60.0.0; WMONID=VIB-N7rRVUS; _ga=GA1.1.153126700.1689945979; _ga_CHSRECZ6BZ=GS1.1.1697849921.2.1.1697850054.60.0.0; JSESSIONID=0001kgWjnDEV95bs4Gq5ncQrmFQ:1avt0fa4q','Expires':'-1'})
-    payload1 = f'SSV:utf-8_ga=GA1.1.153126700.1689945979_ga_CHSRECZ6BZ=GS1.1.1697849921.2.1.1697850054.60.0.0WMONID={wmonid}CUR_PGM_ID=SMSGO02_NewGoodsMstDetailMDataset:ds_inGoodsmstdtlRetrieveGoodsMstDetailBR_RowType_GOODS_CD:STRING(256)GOODS_REGION_CD:STRING(256)ORIGIN_BIZPL_CD:STRING(256)BIZPL_CD:STRING(256)ORD_SP:STRING(256)BIZPL_DSTRB_DT:STRING(256)RTN_DT:STRING(256)N{GOOODCDidx[0]}11VO046VO04622024011720240117'
 
-    response1 = session.post(IMG_ADDRESS_URL1, data=payload1, headers=new_header)
-    # print(response1.text)
+    ## JSESSIONID를 def login으로 받아온 값으로 넣으면 response가 200이나 SSV에 값이 아무것도 포함되지 않음.
+    new_header = update_headers(HEADERS,'')
+    # new_header['Cookie'] = f'_ga=GA1.1.99319122.1689267668; _ga_CHSRECZ6BZ=GS1.1.1689292043.2.0.1689292043.60.0.0; WMONID={wmonid}; _ga=GA1.1.99319122.1689267668; _ga_CHSRECZ6BZ=GS1.1.1689292043.2.0.1689292043.60.0.0; JSESSIONID=0001M4B_eBjYLQc2vAOqfIyCUYQ:1b3rmblbv'
+    payload1 = f'SSV:utf-8_ga=GA1.1.99319122.1689267668_ga_CHSRECZ6BZ=GS1.1.1689292043.2.0.1689292043.60.0.0WMONID={wmonid}CUR_PGM_ID=SMSGO02_GoodsMstDetailMDataset:ds_inGoodsmstdtlRetrieveGoodsMstDetailBR_RowType_GOODS_CD:STRING(256)GOODS_REGION_CD:STRING(256)ORIGIN_BIZPL_CD:STRING(256)BIZPL_CD:STRING(256)ORD_SP:STRING(256)BIZPL_DSTRB_DT:STRING(256)RTN_DT:STRING(256)N{GOOODCDidx[0]}11VDJ92VDJ9222024013120240131'
+    response1 = session.post(IMG_ADDRESS_URL1, data=payload1, headers = new_header, cookies ={'JSESSIONID' : SessionId})
+    print(response1.text)
 
     # jpg주소를 정규표현식방식으로 추출
     if response1.status_code == 200:
@@ -167,19 +163,20 @@ def stk_ck(ssv_data):
         result_list = re.split(r'N\x1f',match)
     return result_list
     
-
+# 상품 이미지 추출 메인 함수
 def main_imgdown():
+    # 세션생성하기
     session = requests.Session()
 
-    # 로그인
-    cookie = login(session)
+    # 로그인 함
+    login(session)
 
-    if cookie:
+    if session:
         wb = openpyxl.load_workbook('your_excel_file.xlsx')
         sheet = wb.active
         for GOOODCDidx in sheet.iter_rows(min_row=2, values_only=True):
             #이미지 주소 파악
-            imgAddressName = search_Imgaddress(session, cookie, GOOODCDidx)
+            imgAddressName = search_Imgaddress(session, GOOODCDidx)
             if imgAddressName:
                 download_image(session, imgAddressName, cookie)
             else:
@@ -207,6 +204,7 @@ if __name__ == "__main__":
         main_imgdown()
 
     elif select == '2':
+        find_date = input('Date(YYYYMMDD):')
         session = requests.Session()
         # 로그인
         cookie = login(session)
@@ -260,6 +258,6 @@ if __name__ == "__main__":
         result_frame = pd.concat(data_frame, axis= 1)
         result_frame = pd.melt(result_frame,id_vars=['점포명','현재코드'],var_name='구분',value_name='값')
         result_frame[['구분', '상품코드']] = result_frame['구분'].str.split('_', expand=True)
-        result_frame = result_frame.query('구분 == "발주"')
+        # result_frame = result_frame.query('구분 == "발주"')
         result_frame.to_excel("출력파일.xlsx", index=False)
 
