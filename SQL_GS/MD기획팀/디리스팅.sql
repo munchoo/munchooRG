@@ -1,0 +1,736 @@
+
+WITH FILTERD_ITEM AS
+ (
+	SELECT	A11.GOODCD  GOODCD
+	FROM	LGMJVDP.TB_STK_MTG_AG	A11
+	JOIN	LGMJVDP.TB_GOOD_DM	A12
+		ON 	(A11.GOODCD = A12.GOODCD)
+--- TM(입지강화) 삭제
+--- 중분류 '소모품|담배|서비스|온라인주류|수수료상품'
+--- 소분류 '소모품|밀박스|특판|주문|카탈|선물세트|특화|특정|온라인|테넌트|군납|아이스크림기기'
+--- 상품명 '특화|한강공원|소모|이벤|특정|특판|TEST|아주대|TEST|주문|행사|예약|판촉|CASE' 포함하는 상품 제외
+
+	WHERE	(A11.YMCD IN ('202511', '202510', '202509', '202508', '202507', '202506', '202505', '202504', '202503', '202502', '202501', '202412')
+		AND A12.GOOD_CLS2CD NOT IN ('4403', '4518', '4618', '0604', '0104', '0204', '0405', '0508', '8106', '1608', '1707', '1807', '2107', '2205', '2306', '2408', '2509', '2617', '2712', '2810', '2906', '3009', '3104', '3206', '3308', '3407', '3517', '3608', '3712', '3809', '4204', '6116', '6613', '6713', '6907', '7009', '7111', '7209', '7309', '7508', '7612', '7718', '7810', '7910', '8006', '0714', '0810', '0903', '1304', '1614', '1910', '2112', '2310', '2405', '2516', '2632', '2722', '2818', '3014', '3210', '3314', '3412', '3532', '3614', '3722', '3815', '4617', '4906', '5106', '5203', '5303', '5405', '5505', '5603', '5706', '5708', '5909', '6007', '6114', '6209', '6404', '6711', '6905', '7610', '7716', '7808', '7908', '5204', '9003', '0712', '0808', '1103', '1106', '1109', '1303', '1605', '1705', '2104', '2303', '2404', '2506', '2614', '2807', '3709', '4003', '4517', '5404', '5504', '5602', '5705', '6006', '6113', '6208', '6609', '6709', '6804', '6904', '7109', '7207', '7609', '7715', '7807', '7907', '8004', '0103', '0203', '0304', '0404', '0605', '0713', '0809', '0904', '1305', '1404', '1506', '1607', '1706', '1806', '1905', '2005', '2106', '2204', '2305', '2406', '2508', '2616', '2711', '2809', '2905', '3006', '3103', '3205', '3307', '3406', '3516', '3607', '3711', '3808', '3907', '4004', '4203', '4307', '4317', '4507', '4519', '4606', '4619', '4708', '4803', '4908', '5304', '5406', '5506', '5604', '5707', '5806', '5910', '6008', '6115', '6210', '6307', '6405', '6610', '6712', '6805', '6906', '7008', '7110', '7208', '7308', '7507', '7611', '7717', '7809', '7909', '8005', '9116', '0505', '7607', '0506')
+		AND NOT REGEXP_LIKE(A12.GOODNM, '특화|한강공원|소모|이벤|특정|특판|TEST|아주대|TEST|주문|행사|예약|판촉|아동|군PX|뮤비페|우한|잼버리|백병원|경쟁사|마사|식풘|야구장|축구장|잠실|CASE$')
+		AND A12.GOOD_CLS1CD NOT IN ('65', '66', '90', '91')
+		and a11.YMCD between '202412' and '202511')
+	GROUP BY	A11.GOODCD
+	HAVING	SUM(A11.NTSAL_AMT) > 0
+	),
+FINAL_SALE AS
+ (
+SELECT	
+	a13.good_cls0cd  GOOD_CLS0CD,
+	MAX(a13.good_cls0nm)  GOOD_CLS0NM,
+	a13.good_cls1cd  GOOD_CLS1CD,
+	MAX(a13.good_cls1nm)  GOOD_CLS1NM,
+	a13.good_cls2cd  GOOD_CLS2CD,
+	MAX(a13.good_cls2nm)  GOOD_CLS2NM,
+	A11.GOODCD  GOODCD,
+	A15.LCT_CONS_GOODS_YN,
+	max(a14.ORD_APP_DT)  RELEASE_DT,
+	MAX(TRIM(TRAILING FROM A13.GOODNM))  GOODNM,
+    MAX(A14.GOODS_STAT)  GOODS_STATUS,
+	SUM(A11.NTSAL_AMT)  AS TOTSAL_AMT,
+	sum(a11.store_cnt) AS STORE_CNT
+FROM LGMJVDP.TB_STK_MTG_AG A11 -- 월별 매출액을 뽑는 집계 데이터
+	JOIN FILTERD_ITEM PA12 ON (A11.GOODCD = PA12.GOODCD)
+	JOIN LGMJVDP.TB_GOOD_DM A13 ON (A11.GOODCD = A13.GOODCD)
+	JOIN GSCSODS.TH_MS_GOODS_DETAIL A14 ON (A11.GOODCD = A14.GOODS_CD)
+	LEFT JOIN GSCSODS.TH_MS_GOODS a15 ON (A11.GOODCD = a15.GOODS_CD)
+WHERE A14.GOODS_REGION_CD = '01'
+	GROUP BY A13.GOOD_CLS0CD, A13.GOOD_CLS1CD, A13.GOOD_CLS2CD, A11.GOODCD, A15.LCT_CONS_GOODS_YN
+ )
+
+SELECT 
+	GOOD_CLS0CD,GOOD_CLS0NM,GOOD_CLS1CD,GOOD_CLS1NM,GOOD_CLS2CD,GOOD_CLS2NM,GOODCD,RELEASE_DT,GOODNM,GOODS_STATUS,TOTSAL_AMT,STORE_CNT, LCT_CONS_GOODS_YN,
+	SUM(STORE_CNT) OVER (PARTITION BY GOOD_CLS2NM) AS STORE_CNT_ALL,
+	SUM(TOTSAL_AMT) OVER (PARTITION BY GOOD_CLS2NM ORDER BY TOTSAL_AMT ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS CUMUL_SALES_AMT_ASC,
+	SUM(TOTSAL_AMT) OVER (PARTITION BY GOOD_CLS2NM ORDER BY TOTSAL_AMT DESC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS CUMUL_SALES_AMT_DESC,
+	CASE 
+		WHEN STORE_CNT = 0 THEN 0 
+		WHEN SUM(STORE_CNT) OVER (PARTITION BY GOOD_CLS2NM) = 0 THEN 0 
+		ELSE CAST(STORE_CNT AS DECIMAL(20,5)) / CAST(SUM(STORE_CNT) OVER (PARTITION BY GOOD_CLS2NM) AS DECIMAL(20,5)) 
+	END AS ADOPTION_RATE
+FROM FINAL_SALE
+GROUP BY 
+	GOOD_CLS0CD, GOOD_CLS0NM, GOOD_CLS1CD, GOOD_CLS1NM, GOOD_CLS2CD, GOOD_CLS2NM, GOODCD, RELEASE_DT, GOODNM, GOODS_STATUS, TOTSAL_AMT, STORE_CNT, LCT_CONS_GOODS_YN
+
+
+
+
+
+
+
+
+
+-- 1) 원본 조건을 그대로 적용한 필터링 결과(월 단위 로우 유지)
+WITH BASE_SALES AS (
+    SELECT
+        A11.YMCD,
+        A11.GOODCD,
+        A11.NTSAL_AMT,
+    FROM LGMJVDP.TB_STK_MTG_AG A11
+    JOIN LGMJVDP.TB_GOOD_DM     A12 ON A11.GOODCD = A12.GOODCD
+    WHERE
+        A11.YMCD BETWEEN '202501' AND '202512'
+        AND A12.GOOD_CLS2CD NOT IN ( '4403','4518','4618','0604','0104','0204','0405','0508','8106','1608','1707','1807','2107','2205','2306','2408','2509','2617','2712','2810','2906','3009','3104','3206','3308','3407','3517','3608','3712','3809','4204','6116','6613','6713','6907','7009','7111','7209','7309','7508','7612','7718','7810','7910','8006','0714','0810','0903','1304','1614','1910','2112','2310','2405','2516','2632','2722','2818','3014','3210','3314','3412','3532','3614','3722','3815','4617','4906','5106','5203','5303','5405','5505','5603','5706','5708','5909','6007','6114','6209','6404','6711','6905','7610','7716','7808','7908','5204','9003','0712','0808','1103','1106','1109','1303','1605','1705','2104','2303','2404','2506','2614','2807','3709','4003','4517','5404','5504','5602','5705','6006','6113','6208','6609','6709','6804','6904','7109','7207','7609','7715','7807','7907','8004','0103','0203','0304','0404','0605','0713','0809','0904','1305','1404','1506','1607','1706','1806','1905','2005','2106','2204','2305','2406','2508','2616','2711','2809','2905','3006','3103','3205','3307','3406','3516','3607','3711','3808','3907','4004','4203','4307','4317','4507','4519','4606','4619','4708','4803','4908','5304','5406','5506','5604','5707','5806','5910','6008','6115','6210','6307','6405','6610','6712','6805','6906','7008','7110','7208','7308','7507','7611','7717','7809','7909','8005','9116','0505','7607','0506' )
+        AND A12.GOOD_CLS1CD NOT IN ('65','66','90','91')
+        AND NOT REGEXP_LIKE(
+            A12.GOODNM,
+            '$사전|특화|한강공원|소모|이벤|특정|특판|TEST|아주대|TEST|주문|행사|예약|판촉|아동|군PX|뮤비페|우한|잼버리|백병원|경쟁사|마사|식풘|야구장|축구장|잠실|CASE$|우동G'
+        )
+),
+
+-- 1-1) 기간 매출 합계(상품 단위)
+SALES_AGG AS (
+    SELECT
+        GOODCD,
+        SUM(NTSAL_AMT) AS TOTSAL_AMT
+    FROM BASE_SALES
+    GROUP BY GOODCD
+),
+
+-- 1-2) 최신재고와 취급률 산출
+LATEST_METRICS AS (
+        
+        SELECT
+        A11.GOODCD,
+        A11.STORE_CNT,
+        A11.STK_QTY,
+        A11.STK_AMT
+    FROM LGMJVDP.TB_STK_ft  A11
+    JOIN LGMJVDP.TB_GOOD_DM     A12 ON A11.GOODCD = A12.GOODCD
+    WHERE
+        A11.YMCD BETWEEN '202501' AND '202512'
+        AND A12.GOOD_CLS2CD NOT IN ( '4403','4518','4618','0604','0104','0204','0405','0508','8106','1608','1707','1807','2107','2205','2306','2408','2509','2617','2712','2810','2906','3009','3104','3206','3308','3407','3517','3608','3712','3809','4204','6116','6613','6713','6907','7009','7111','7209','7309','7508','7612','7718','7810','7910','8006','0714','0810','0903','1304','1614','1910','2112','2310','2405','2516','2632','2722','2818','3014','3210','3314','3412','3532','3614','3722','3815','4617','4906','5106','5203','5303','5405','5505','5603','5706','5708','5909','6007','6114','6209','6404','6711','6905','7610','7716','7808','7908','5204','9003','0712','0808','1103','1106','1109','1303','1605','1705','2104','2303','2404','2506','2614','2807','3709','4003','4517','5404','5504','5602','5705','6006','6113','6208','6609','6709','6804','6904','7109','7207','7609','7715','7807','7907','8004','0103','0203','0304','0404','0605','0713','0809','0904','1305','1404','1506','1607','1706','1806','1905','2005','2106','2204','2305','2406','2508','2616','2711','2809','2905','3006','3103','3205','3307','3406','3516','3607','3711','3808','3907','4004','4203','4307','4317','4507','4519','4606','4619','4708','4803','4908','5304','5406','5506','5604','5707','5806','5910','6008','6115','6210','6307','6405','6610','6712','6805','6906','7008','7110','7208','7308','7507','7611','7717','7809','7909','8005','9116','0505','7607','0506' )
+        AND A12.GOOD_CLS1CD NOT IN ('65','66','90','91')
+        AND NOT REGEXP_LIKE(
+            A12.GOODNM,
+            '$사전|특화|한강공원|소모|이벤|특정|특판|TEST|아주대|TEST|주문|행사|예약|판촉|아동|군PX|뮤비페|우한|잼버리|백병원|경쟁사|마사|식풘|야구장|축구장|잠실|CASE$|우동G'
+        )
+),
+
+-- 2) 지역코드 '01' 기준 최신 1건만 확정
+GOODS_DETAIL_LATEST AS (
+    SELECT GOODS_CD, GOODS_REGION_CD, ORD_APP_DT, GOODS_STAT
+    FROM (
+        SELECT
+            A14.GOODS_CD,
+            A14.GOODS_REGION_CD,
+            A14.ORD_APP_DT,
+            A14.GOODS_STAT,
+            ROW_NUMBER() OVER (
+                PARTITION BY A14.GOODS_CD, A14.GOODS_REGION_CD
+                ORDER BY A14.ORD_APP_DT DESC
+            ) AS RN
+        FROM GSCSODS.TH_MS_GOODS_DETAIL A14
+        WHERE A14.GOODS_REGION_CD = '01'
+    ) T
+    WHERE RN = 1
+),
+-- 3) 최종 (매출은 기간합, store/stock은 최신월 값)
+FINAL_SALE AS (
+    SELECT
+        DM.GOOD_CLS0CD                                  AS GOOD_CLS0CD,
+        DM.GOOD_CLS0NM                                  AS GOOD_CLS0NM,
+        DM.GOOD_CLS1CD                                  AS GOOD_CLS1CD,
+        DM.GOOD_CLS1NM                                  AS GOOD_CLS1NM,
+        DM.GOOD_CLS2CD                                  AS GOOD_CLS2CD,
+        DM.GOOD_CLS2NM                                  AS GOOD_CLS2NM,
+        SA.GOODCD                                       AS GOODCD,
+        GL.ORD_APP_DT                                   AS RELEASE_DT,
+        TRIM(TRAILING FROM DM.GOODNM)                   AS GOODNM,
+        GL.GOODS_STAT                                   AS GOODS_STATUS,
+        SA.TOTSAL_AMT                                   AS TOTSAL_AMT,
+        LM.STORE_CNT_LAST                               AS STORE_CNT,
+        LM.STK_QTY_LAST                                 AS STK_QTY,
+        LM.STK_AMT_LAST                                 AS STK_AMT,
+        MS.LCT_CONS_GOODS_YN                             AS LCT_CONS_GOODS_YN
+    FROM SALES_AGG SA
+    JOIN LGMJVDP.TB_GOOD_DM DM
+      ON SA.GOODCD = DM.GOODCD
+    JOIN LATEST_METRICS LM
+      ON SA.GOODCD = LM.GOODCD
+    JOIN GOODS_DETAIL_LATEST GL
+      ON SA.GOODCD = GL.GOODS_CD
+    LEFT JOIN GSCSODS.TH_MS_GOODS MS
+      ON SA.GOODCD = MS.GOODS_CD
+    WHERE SA.TOTSAL_AMT > 0
+)
+-- 4) 윈도우 계산
+SELECT
+    GOOD_CLS0CD, GOOD_CLS0NM,
+    GOOD_CLS1CD, GOOD_CLS1NM,
+    GOOD_CLS2CD, GOOD_CLS2NM,
+    GOODCD, RELEASE_DT, GOODNM, GOODS_STATUS,
+    TOTSAL_AMT, STORE_CNT, LCT_CONS_GOODS_YN,
+    STK_AMT, STK_QTY,
+
+    SUM(TOTSAL_AMT) OVER (
+        PARTITION BY GOOD_CLS1NM
+        ORDER BY TOTSAL_AMT
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+    ) AS CUMUL_SALES_AMT_ASC,
+
+    SUM(TOTSAL_AMT) OVER (
+        PARTITION BY GOOD_CLS1NM
+        ORDER BY TOTSAL_AMT DESC
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+    ) AS CUMUL_SALES_AMT_DESC,
+    (STORE_CNT * 1.0) / NULLIF(SUM(STORE_CNT) OVER (PARTITION BY GOOD_CLS1NM), 0) AS ADOPTION_RATE
+FROM FINAL_SALE;
+
+
+
+
+
+
+
+
+WITH
+-- 0) 상품 필터(기존 DM 조건 그대로)
+FILTER_GOODS AS (
+    SELECT
+        DM.GOODCD,
+        DM.GOOD_CLS0CD, DM.GOOD_CLS0NM,
+        DM.GOOD_CLS1CD, DM.GOOD_CLS1NM,
+        DM.GOOD_CLS2CD, DM.GOOD_CLS2NM,
+        DM.GOODNM
+    FROM LGMJVDP.TB_GOOD_DM DM
+    WHERE 1=1
+      AND DM.GOOD_CLS2CD NOT IN ( '4403','4518','4618','0604','0104','0204','0405','0508','8106','1608','1707','1807','2107','2205','2306','2408','2509','2617','2712','2810','2906','3009','3104','3206','3308','3407','3517','3608','3712','3809','4204','6116','6613','6713','6907','7009','7111','7209','7309','7508','7612','7718','7810','7910','8006','0714','0810','0903','1304','1614','1910','2112','2310','2405','2516','2632','2722','2818','3014','3210','3314','3412','3532','3614','3722','3815','4617','4906','5106','5203','5303','5405','5505','5603','5706','5708','5909','6007','6114','6209','6404','6711','6905','7610','7716','7808','7908','5204','9003','0712','0808','1103','1106','1109','1303','1605','1705','2104','2303','2404','2506','2614','2807','3709','4003','4517','5404','5504','5602','5705','6006','6113','6208','6609','6709','6804','6904','7109','7207','7609','7715','7807','7907','8004','0103','0203','0304','0404','0605','0713','0809','0904','1305','1404','1506','1607','1706','1806','1905','2005','2106','2204','2305','2406','2508','2616','2711','2809','2905','3006','3103','3205','3307','3406','3516','3607','3711','3808','3907','4004','4203','4307','4317','4507','4519','4606','4619','4708','4803','4908','5304','5406','5506','5604','5707','5806','5910','6008','6115','6210','6307','6405','6610','6712','6805','6906','7008','7110','7208','7308','7507','7611','7717','7809','7909','8005','9116','0505','7607','0506' )
+      AND DM.GOOD_CLS1CD NOT IN ('65','66','90','91')
+      AND NOT REGEXP_LIKE(
+          DM.GOODNM,
+          '$사전|특화|한강공원|소모|이벤|특정|특판|TEST|아주대|TEST|주문|행사|예약|판촉|아동|군PX|뮤비페|우한|잼버리|백병원|경쟁사|마사|식풘|야구장|축구장|잠실|CASE$|우동G'
+      )
+),
+
+-- 1) 일 원시(FT)에서 분석기간 데이터만 (필요 컬럼만)
+BASE_FT AS (
+    SELECT
+        FT.DATECD,         -- YYYYMMDD (가정)
+        FT.GOODCD,
+        FT.storecd,         -- 점포키(취급점 count용)
+        FT.NTSAL_AMT,       -- 일 매출액 (실제 컬럼명으로 교체)
+        FT.STK_QTY,         -- 일 재고수량(스냅샷)
+        FT.STK_AMT          -- 일 재고금액(스냅샷)
+    FROM LGMJVDP.TB_STK_FT FT
+    JOIN FILTER_GOODS G
+      ON FT.GOODCD = G.GOODCD
+    WHERE FT.DATECD BETWEEN date('20250101') AND date('20251231')
+),
+
+-- 2A) 기간 매출 합계(상품 단위)
+SALES_AGG AS (
+    SELECT
+        GOODCD,
+        SUM(NTSAL_AMT) AS TOTSAL_AMT
+    FROM BASE_FT
+    GROUP BY GOODCD
+),
+
+-- 2B) 기간 내 최종일자 스냅샷 (상품별 마지막 DATECD 찾기)
+LAST_DAY AS (
+    SELECT
+        GOODCD,
+        MAX(DATECD) AS LAST_DATECD
+    FROM BASE_FT
+    GROUP BY GOODCD
+),
+
+-- 2C) 최종일자 기준 취급점/재고 계산
+LAST_SNAPSHOT AS (
+    SELECT
+        B.GOODCD,
+        L.LAST_DATECD,
+        COUNT(DISTINCT B.STORECD) AS STORE_CNT_LAST,  -- 최종일 취급점
+        SUM(B.STK_QTY)           AS STK_QTY_LAST,    -- 최종일 재고(전점 합)
+        SUM(B.STK_AMT)           AS STK_AMT_LAST     -- 최종일 재고금액(전점 합)
+    FROM BASE_FT B
+    JOIN LAST_DAY L
+      ON B.GOODCD = L.GOODCD
+     AND B.DATECD = L.LAST_DATECD
+    GROUP BY B.GOODCD, L.LAST_DATECD
+),
+
+-- 3) (기존) 상품상세 최신 1건
+GOODS_DETAIL_LATEST AS (
+    SELECT GOODS_CD, GOODS_REGION_CD, ORD_APP_DT, GOODS_STAT
+    FROM (
+        SELECT
+            A14.GOODS_CD,
+            A14.GOODS_REGION_CD,
+            A14.ORD_APP_DT,
+            A14.GOODS_STAT,
+            ROW_NUMBER() OVER (
+                PARTITION BY A14.GOODS_CD, A14.GOODS_REGION_CD
+                ORDER BY A14.ORD_APP_DT DESC
+            ) AS RN
+        FROM GSCSODS.TH_MS_GOODS_DETAIL A14
+        WHERE A14.GOODS_REGION_CD = '01'
+    ) T
+    WHERE RN = 1
+),
+
+-- 4) 최종 결합
+FINAL_SALE AS (
+    SELECT
+        G.GOOD_CLS0CD, G.GOOD_CLS0NM,
+        G.GOOD_CLS1CD, G.GOOD_CLS1NM,
+        G.GOOD_CLS2CD, G.GOOD_CLS2NM,
+        G.GOODCD,
+        GL.ORD_APP_DT                    AS RELEASE_DT,
+        RTRIM(G.GOODNM)                  AS GOODNM,
+        GL.GOODS_STAT                    AS GOODS_STATUS,
+        SA.TOTSAL_AMT,
+        LS.STORE_CNT_LAST                AS STORE_CNT,
+        LS.STK_QTY_LAST                  AS STK_QTY,
+        LS.STK_AMT_LAST                  AS STK_AMT,
+        MS.LCT_CONS_GOODS_YN             AS LCT_CONS_GOODS_YN,
+        LS.LAST_DATECD                   AS SNAPSHOT_DATECD
+    FROM FILTER_GOODS G
+    JOIN SALES_AGG SA
+      ON G.GOODCD = SA.GOODCD
+    JOIN LAST_SNAPSHOT LS
+      ON G.GOODCD = LS.GOODCD
+    JOIN GOODS_DETAIL_LATEST GL
+      ON G.GOODCD = GL.GOODS_CD
+    LEFT JOIN GSCSODS.TH_MS_GOODS MS
+      ON G.GOODCD = MS.GOODS_CD
+    WHERE SA.TOTSAL_AMT > 0
+)
+
+SELECT
+    GOOD_CLS0CD, GOOD_CLS0NM,
+    GOOD_CLS1CD, GOOD_CLS1NM,
+    GOOD_CLS2CD, GOOD_CLS2NM,
+    GOODCD, RELEASE_DT, GOODNM, GOODS_STATUS,
+    TOTSAL_AMT, STORE_CNT, LCT_CONS_GOODS_YN,
+    STK_AMT, STK_QTY,
+    SNAPSHOT_DATECD,
+
+    SUM(TOTSAL_AMT) OVER (
+        PARTITION BY GOOD_CLS1NM
+        ORDER BY TOTSAL_AMT
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+    ) AS CUMUL_SALES_AMT_ASC,
+
+    SUM(TOTSAL_AMT) OVER (
+        PARTITION BY GOOD_CLS1NM
+        ORDER BY TOTSAL_AMT DESC
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+    ) AS CUMUL_SALES_AMT_DESC,
+
+    (STORE_CNT * 1.0) / NULLIF(SUM(STORE_CNT) OVER (PARTITION BY GOOD_CLS1NM), 0) AS ADOPTION_RATE
+FROM FINAL_SALE;
+
+\
+
+
+
+
+
+
+
+
+
+
+with	 gopa1 as
+ (select	a11.GOODCD  GOODCD,
+		a11.YMCD  YMCD,
+		sum(a11.ntsal_amt)  WJXBFS1,
+		sum(a11.STORE_CNT)  WJXBFS2,
+		sum(a11.stk_qty)  WJXBFS3
+	from	LGMJVDP.TB_STK_MTG_AG	a11
+		join	LGMJVDP.TB_MONTH_DM	a12
+		  on 	(a11.YMCD = a12.YMCD)
+	where	(a12.YYNM in (2025)
+	 and a11.GOODCD in ('8809251335877'))
+	group by	a11.GOODCD,
+		a11.YMCD
+	), 
+	 gopa2 as
+ (select	a11.GOODCD  GOODCD,
+			a11.datecd  datecd,
+			a12.YMCD  YMCD,
+			sum(a11.stk_qty)  WJXBFS1
+		from	LGMJVDP.TB_STK_DRG_AG	a11
+			join	LGMJVDP.TB_DATE_DM	a12
+			  on 	(a11.datecd = a12.datecd)
+		where	(a12.YYNM in (2025)
+		 and a11.GOODCD in ('8809251335877'))
+		group by	a11.GOODCD,
+			a11.datecd,
+			a12.YMCD
+		), 
+	 gopa3 as
+ (select	pc11.GOODCD  GOODCD,
+			pc11.YMCD  YMCD,
+			max(pc11.datecd)  WJXBFS1
+		from	gopa2	pc11
+		group by	pc11.GOODCD,
+			pc11.YMCD
+		), 
+	 gopa4 as
+ (select	distinct pa11.GOODCD  GOODCD,
+		pa11.YMCD  YMCD,
+		pa11.WJXBFS1  WJXBFS1
+	from	gopa2	pa11
+		join	gopa3	pa12
+		  on 	(pa11.GOODCD = pa12.GOODCD and 
+		pa11.YMCD = pa12.YMCD and 
+		pa11.datecd = pa12.WJXBFS1)
+	)
+select	distinct coalesce(pa11.GOODCD, pa12.GOODCD)  GOODCD,
+	trim(trailing from a13.GOODNM)  GOODNM,
+	coalesce(pa11.YMCD, pa12.YMCD)  YMCD,
+	pa11.WJXBFS1  WJXBFS1,
+	pa11.WJXBFS2  WJXBFS2,
+	pa11.WJXBFS3  WJXBFS3,
+	pa12.WJXBFS1  WJXBFS4
+from	gopa1	pa11
+	full outer join	gopa4	pa12
+	  on 	(pa11.GOODCD = pa12.GOODCD and 
+	pa11.YMCD = pa12.YMCD)
+	join	LGMJVDP.TB_GOOD_DM	a13
+	  on 	(coalesce(pa11.GOODCD, pa12.GOODCD) = a13.GOODCD)
+
+      \\
+
+
+
+
+
+
+
+--#####  SQL_GS/MD기획팀/디리스팅.sql #####-- version 1.0
+
+WITH
+/* 0) 공통 상품 필터 */
+FIWITH
+/* 1) 월 캘린더: YMCD별 월말을 DATE 타입으로 생성 */
+MONTH_CAL AS (
+    SELECT
+        YMCD,
+        MAX(DATE(
+            CASE
+                WHEN LENGTH(CHAR(DATECD)) = 8
+                    THEN TIMESTAMP_FORMAT(CHAR(DATECD), 'YYYYMMDD')
+                ELSE DATECD
+            END
+        )) AS MONTH_END_DT
+    FROM LGMJVDP.TB_DATE_DM
+    WHERE YMCD BETWEEN '202201' AND '202512'
+    GROUP BY YMCD
+),
+
+/* 2) 상품상태 이력: ORD_APP_DT도 DATE로 통일 */
+STAT_HIST AS (
+    SELECT
+        GOODS_CD,
+        GOODS_REGION_CD,
+        DATE(
+            CASE
+                WHEN LENGTH(CHAR(ORD_APP_DT)) = 8
+                    THEN TIMESTAMP_FORMAT(CHAR(ORD_APP_DT), 'YYYYMMDD')
+                ELSE ORD_APP_DT
+            END
+        ) AS ORD_APP_DT_DT,
+        GOODS_STAT
+    FROM GSCSODS.TH_MS_GOODS_DETAIL_HIST
+    WHERE GOODS_REGION_CD = '01'
+),
+
+/* 3) 월말(as-of) 조인 */
+STAT_BY_MONTH_CAND AS (
+    SELECT
+        M.YMCD,
+        H.GOODS_CD,
+        H.GOODS_STAT,
+        H.ORD_APP_DT_DT,
+        ROW_NUMBER() OVER (
+            PARTITION BY M.YMCD, H.GOODS_CD
+            ORDER BY H.ORD_APP_DT_DT DESC, H.GOODS_STAT DESC
+        ) AS RN
+    FROM MONTH_CAL M
+    JOIN STAT_HIST H
+      ON H.ORD_APP_DT_DT <= M.MONTH_END_DT
+)
+
+SELECT
+    YMCD,
+    GOODS_CD,
+    GOODS_STAT,
+    ORD_APP_DT_DT AS LAST_CHANGE_DT
+FROM STAT_BY_MONTH_CAND
+WHERE RN = 1
+ORDER BY GOODS_CD, YMCD;
+
+
+/* 1) MRG(월집계)에서 매출만 */
+BASE_MRG AS (
+    SELECT
+        A11.YMCD,
+        A11.GOODCD,
+        A11.NTSAL_AMT
+    FROM LGMJVDP.TB_STK_MTG_AG A11
+    JOIN FILTER_GOODS G
+      ON A11.GOODCD = G.GOODCD
+    WHERE A11.YMCD BETWEEN '202512' AND '202512'
+),
+
+SALES_AGG AS (
+    SELECT
+        GOODCD,
+        SUM(NTSAL_AMT) AS TOTSAL_AMT
+    FROM BASE_MRG
+    GROUP BY GOODCD
+),
+
+/* 2) DRG(일집계)에서 2025년 최종일 스냅샷 1건 */
+DRG_DAILY AS (
+    SELECT
+        A11.GOODCD,
+        A11.DATECD,
+        sum(A11.STORE_CNT) AS STORE_CNT,  -- ※ 필요 시 MAX로 변경
+        sum(A11.STK_QTY)   AS STK_QTY,
+        sum(A11.STK_AMT)   AS STK_AMT
+    FROM LGMJVDP.TB_STK_DRG_AG A11
+    JOIN LGMJVDP.TB_DATE_DM A12
+      ON A11.DATECD = A12.DATECD
+    JOIN FILTER_GOODS G
+      ON A11.GOODCD = G.GOODCD
+    WHERE A12.YMCD = '202512'
+    GROUP BY
+        A11.GOODCD, A11.DATECD
+),
+
+DRG_LAST_DATE AS (
+    SELECT
+        GOODCD,
+        MAX(DATECD) - 1 AS LAST_DATECD
+    FROM DRG_DAILY
+    GROUP BY GOODCD
+),
+
+DRG_LAST_SNAPSHOT AS (
+    SELECT
+        D.GOODCD,
+        D.STORE_CNT AS STORE_CNT_LAST,
+        D.STK_QTY   AS STK_QTY_LAST,
+        D.STK_AMT   AS STK_AMT_LAST
+    FROM DRG_DAILY D
+    JOIN DRG_LAST_DATE L
+      ON D.GOODCD = L.GOODCD
+     AND D.DATECD = L.LAST_DATECD
+),
+
+/* 3) 상품상세 최신 1건 */
+GOODS_DETAIL_LATEST AS (
+    SELECT GOODS_CD, GOODS_REGION_CD, ORD_APP_DT, GOODS_STAT
+    FROM (
+        SELECT
+            A14.GOODS_CD,
+            A14.GOODS_REGION_CD,
+            A14.ORD_APP_DT,
+            A14.GOODS_STAT,
+            ROW_NUMBER() OVER (
+                PARTITION BY A14.GOODS_CD, A14.GOODS_REGION_CD
+                ORDER BY A14.ORD_APP_DT DESC
+            ) AS RN
+        FROM GSCSODS.TH_MS_GOODS_DETAIL A14
+        WHERE A14.GOODS_REGION_CD = '01'
+    ) T
+    WHERE RN = 1
+),
+
+FINAL_SALE AS (
+    SELECT
+        G.GOOD_CLS0CD, G.GOOD_CLS0NM,
+        G.GOOD_CLS1CD, G.GOOD_CLS1NM,
+        G.GOOD_CLS2CD, G.GOOD_CLS2NM,
+        SA.GOODCD                                   AS GOODCD,
+        GL.ORD_APP_DT                               AS RELEASE_DT,
+        RTRIM(G.GOODNM)                             AS GOODNM,
+        GL.GOODS_STAT                               AS GOODS_STATUS,
+        coalesce(SA.TOTSAL_AMT, 0)                    AS TOTSAL_AMT,
+        coalesce(DLS.STORE_CNT_LAST, 0)             AS STORE_CNT,
+        coalesce(DLS.STK_QTY_LAST, 0)               AS STK_QTY,
+        coalesce(DLS.STK_AMT_LAST, 0)               AS STK_AMT,
+        MS.LCT_CONS_GOODS_YN                         AS LCT_CONS_GOODS_YN
+    FROM SALES_AGG SA
+    JOIN FILTER_GOODS G
+      ON SA.GOODCD = G.GOODCD
+    LEFT JOIN DRG_LAST_SNAPSHOT DLS
+      ON SA.GOODCD = DLS.GOODCD
+    JOIN GOODS_DETAIL_LATEST GL
+      ON SA.GOODCD = GL.GOODS_CD
+    LEFT JOIN GSCSODS.TH_MS_GOODS MS
+      ON SA.GOODCD = MS.GOODS_CD
+    WHERE SA.TOTSAL_AMT > 0
+)
+
+SELECT
+    GOOD_CLS0CD, GOOD_CLS0NM,
+    GOOD_CLS1CD, GOOD_CLS1NM,
+    GOOD_CLS2CD, GOOD_CLS2NM,
+    GOODCD, RELEASE_DT, GOODNM, GOODS_STATUS,
+    TOTSAL_AMT, STORE_CNT, LCT_CONS_GOODS_YN,
+    STK_AMT, STK_QTY
+    -- SUM(TOTSAL_AMT) OVER (
+    --     PARTITION BY GOOD_CLS1NM
+    --     ORDER BY TOTSAL_AMT
+    --     ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+    -- ) AS CUMUL_SALES_AMT_ASC,
+    -- SUM(TOTSAL_AMT) OVER (
+    --     PARTITION BY GOOD_CLS1NM
+    --     ORDER BY TOTSAL_AMT DESC
+    --     ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+    -- ) AS CUMUL_SALES_AMT_DESC,
+    -- (STORE_CNT * 1.0) / NULLIF(SUM(STORE_CNT) OVER (PARTITION BY GOOD_CLS1NM), 0) AS ADOPTION_RATE
+FROM FINAL_SALE;
+
+
+
+
+
+
+
+
+
+------------------ 
+--#####  SQL_GS/MD기획팀/디리스팅.sql #####-- version 2.0   
+-- 상품상태마스트를 확인 월별 상품 상태 마스터 상태와 최신 재고/매출 현황을 결합
+-- 월별 마스터 살
+WITH
+-- 0) 상품 필터(기존 DM 조건 그대로)
+FILTER_GOODS AS (
+    SELECT
+        DM.GOODCD,
+        DM.GOOD_CLS0CD, DM.GOOD_CLS0NM,
+        DM.GOOD_CLS1CD, DM.GOOD_CLS1NM,
+        DM.GOOD_CLS2CD, DM.GOOD_CLS2NM,
+        DM.GOODNM
+    FROM LGMJVDP.TB_GOOD_DM DM
+    WHERE 1=1
+      AND DM.GOOD_CLS2CD NOT IN ( '4403','4518','4618','0604','0104','0204','0405','0508','8106','1608','1707','1807','2107','2205','2306','2408','2509','2617','2712','2810','2906','3009','3104','3206','3308','3407','3517','3608','3712','3809','4204','6116','6613','6713','6907','7009','7111','7209','7309','7508','7612','7718','7810','7910','8006','0714','0810','0903','1304','1614','1910','2112','2310','2405','2516','2632','2722','2818','3014','3210','3314','3412','3532','3614','3722','3815','4617','4906','5106','5203','5303','5405','5505','5603','5706','5708','5909','6007','6114','6209','6404','6711','6905','7610','7716','7808','7908','5204','9003','0712','0808','1103','1106','1109','1303','1605','1705','2104','2303','2404','2506','2614','2807','3709','4003','4517','5404','5504','5602','5705','6006','6113','6208','6609','6709','6804','6904','7109','7207','7609','7715','7807','7907','8004','0103','0203','0304','0404','0605','0713','0809','0904','1305','1404','1506','1607','1706','1806','1905','2005','2106','2204','2305','2406','2508','2616','2711','2809','2905','3006','3103','3205','3307','3406','3516','3607','3711','3808','3907','4004','4203','4307','4317','4507','4519','4606','4619','4708','4803','4908','5304','5406','5506','5604','5707','5806','5910','6008','6115','6210','6307','6405','6610','6712','6805','6906','7008','7110','7208','7308','7507','7611','7717','7809','7909','8005','9116','0505','7607','0506' )
+      AND DM.GOOD_CLS1CD NOT IN ('65','66','90','91')
+      AND NOT REGEXP_LIKE(
+          DM.GOODNM,
+          '$사전|특화|한강공원|소모|이벤|특정|특판|TEST|아주대|TEST|주문|행사|예약|판촉|아동|군PX|뮤비페|우한|잼버리|백병원|경쟁사|마사|식풘|야구장|축구장|잠실|CASE$|우동G'
+      )
+),
+
+/* 1) 월 캘린더: YMCD별 월말을 DATE 타입으로 생성 */
+MONTH_CAL AS (
+    SELECT
+        YMCD,
+        MAX(DATE(
+            CASE
+                WHEN LENGTH(CHAR(DATECD)) = 8
+                    THEN TIMESTAMP_FORMAT(CHAR(DATECD), 'YYYYMMDD')
+                ELSE DATECD
+            END
+        )) AS MONTH_END_DT
+    FROM LGMJVDP.TB_DATE_DM
+    WHERE YMCD BETWEEN '202201' AND '202512'
+    GROUP BY YMCD
+),
+
+/* 2) 상품상태 이력: ORD_APP_DT도 DATE로 통일 */
+STAT_HIST AS (
+    SELECT
+        H.GOODS_CD,
+        H.GOODS_REGION_CD,
+        DATE(
+            CASE
+                WHEN LENGTH(CHAR(H.ORD_APP_DT)) = 8
+                    THEN TIMESTAMP_FORMAT(CHAR(H.ORD_APP_DT), 'YYYYMMDD')
+                ELSE H.ORD_APP_DT
+            END
+        ) AS ORD_APP_DT_DT,
+        H.GOODS_STAT
+    FROM GSCSODS.TH_MS_GOODS_DETAIL_HIST H
+    JOIN FILTER_GOODS G
+      ON H.GOODS_CD = G.GOODCD
+    WHERE H.GOODS_REGION_CD = '01'
+),
+
+/* 3) 월말(as-of) 조인: 월말 기준 유효 상태 */
+STAT_BY_MONTH_CAND AS (
+    SELECT
+        M.YMCD,
+        H.GOODS_CD,
+        H.GOODS_STAT,
+        H.ORD_APP_DT_DT,
+        ROW_NUMBER() OVER (
+            PARTITION BY M.YMCD, H.GOODS_CD
+            ORDER BY H.ORD_APP_DT_DT DESC, H.GOODS_STAT DESC
+        ) AS RN
+    FROM MONTH_CAL M
+    JOIN STAT_HIST H
+      ON H.ORD_APP_DT_DT <= M.MONTH_END_DT
+),
+
+STAT_BY_MONTH AS (
+    SELECT
+        YMCD,
+        GOODS_CD,
+        GOODS_STAT,
+        ORD_APP_DT_DT AS LAST_CHANGE_DT
+    FROM STAT_BY_MONTH_CAND
+    WHERE RN = 1
+),
+
+/* 4) (추가) 해당월 매출액: MRG(TB_STK_MTG_AG)에서 월별/상품별 집계 */
+MRG_SALES AS (
+    SELECT
+        A11.YMCD,
+        G.good_cls0cd,
+        G.good_cls0nm,
+        G.good_cls1cd,
+        G.good_cls1nm,
+        G.good_cls2cd,
+        G.good_cls2nm,
+        A11.GOODCD AS GOODS_CD,
+        SUM(A11.NTSAL_AMT) AS NTSAL_AMT_M
+    FROM LGMJVDP.TB_STK_MTG_AG A11
+    JOIN FILTER_GOODS G
+      ON A11.GOODCD = G.GOODCD
+    WHERE A11.YMCD BETWEEN '202201' AND '202512'
+    GROUP BY
+        A11.YMCD,
+        G.good_cls0cd,
+        G.good_cls0nm,
+        G.good_cls1cd,
+        G.good_cls1nm,
+        G.good_cls2cd,
+        G.good_cls2nm,
+        A11.GOODCD
+)
+
+/* 5) 월별 상태 + 월별 매출 결합 */
+SELECT
+    S.YMCD,
+    M.GOOD_CLS0CD,
+    M.GOOD_CLS0NM,
+    M.GOOD_CLS1CD,
+    M.GOOD_CLS1NM,
+    M.GOOD_CLS2CD,
+    M.GOOD_CLS2NM,
+    S.GOODS_CD,
+    S.GOODS_STAT,
+    S.LAST_CHANGE_DT,
+    COALESCE(M.NTSAL_AMT_M, 0) AS NTSAL_AMT_M
+FROM STAT_BY_MONTH S
+LEFT JOIN MRG_SALES M
+  ON S.YMCD = M.YMCD
+ AND S.GOODS_CD = M.GOODS_CD
+WHERE 1=1
+    AND M.NTSAL_AMT_M > 0
+ORDER BY
+    S.GOODS_CD,
+    S.YMCD;
